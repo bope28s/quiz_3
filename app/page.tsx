@@ -53,9 +53,9 @@ export default function Home() {
             🏰 어둠의 마법사가 엄마와 아빠를 마법의 성에 가두었어요! 🏰
           </div>
           <div className="text-lg md:text-xl text-gray-700 leading-relaxed">
-            용감한 영웅이 되어 퀴즈를 풀면서 엄마와 아빠를 구출해보세요!<br/>
-            각 관문을 지키는 마법사들을 물리치고 힌트를 모아서<br/>
-            마침내 가족을 다시 만날 수 있을 거예요! 💕
+            용감한 영웅이 되어 퀴즈와 미니게임을 통해 엄마와 아빠를 구출해보세요!<br/>
+            각 관문을 지키는 마법사들과 대화하며 힌트를 모아서<br/>
+            마침내 가족의 위치를 찾고 다시 만날 수 있을 거예요! 💕
           </div>
         </motion.div>
 
@@ -64,7 +64,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
         >
           <div className="quiz-card rounded-2xl p-6">
             <div className="text-4xl mb-4">🧮</div>
@@ -72,9 +72,14 @@ export default function Home() {
             <p className="text-gray-600">수학, 한글, 동물, 색깔 등 다양한 문제를 풀어보세요!</p>
           </div>
           <div className="quiz-card rounded-2xl p-6">
-            <div className="text-4xl mb-4">💡</div>
-            <h3 className="text-xl font-semibold text-gray-800 mb-2">도움의 힌트</h3>
-            <p className="text-gray-600">문제가 어려우면 힌트를 받아서 다시 도전해보세요!</p>
+            <div className="text-4xl mb-4">🎮</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">미니게임</h3>
+            <p className="text-gray-600">기억력, 순서 맞추기, 패턴 찾기 등 재미있는 게임을 해보세요!</p>
+          </div>
+          <div className="quiz-card rounded-2xl p-6">
+            <div className="text-4xl mb-4">🧙‍♂️</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">마법사 대화</h3>
+            <p className="text-gray-600">각 관문의 마법사들과 대화하며 힌트를 모아보세요!</p>
           </div>
           <div className="quiz-card rounded-2xl p-6">
             <div className="text-4xl mb-4">🏆</div>

@@ -6,6 +6,10 @@ import { ArrowLeft, Lightbulb, Trophy, Star } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { getLevelById, getTotalLevels, getRandomQuestion } from '@/data/quizzes';
+import { getMinigameByLevel } from '@/data/minigames';
+import { getWizardDialogueByLevel } from '@/data/wizardDialogues';
+import MinigameComponent from '@/app/components/MinigameComponent';
+import WizardDialogue, { WizardDialogueWithState } from '@/app/components/WizardDialogue';
 
 export default function QuizPage() {
   const params = useParams();
@@ -18,6 +22,16 @@ export default function QuizPage() {
   const [showHint, setShowHint] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [showReward, setShowReward] = useState(false);
+  
+  // 새로운 상태들
+  const [gamePhase, setGamePhase] = useState<'intro' | 'minigame' | 'minigameIntro' | 'minigameOutro' | 'quiz' | 'result'>('intro');
+  const [wizardDialogue, setWizardDialogue] = useState(getWizardDialogueByLevel(levelId));
+  const [minigame, setMinigame] = useState(getMinigameByLevel(levelId));
+  const [collectedHints, setCollectedHints] = useState<{mom: string[], dad: string[]}>({mom: [], dad: []});
+  const [showWizardHint, setShowWizardHint] = useState(false);
+  
+  // 미니게임이 있는 레벨인지 확인
+  const hasMinigame = [1, 5, 10].includes(levelId);
 
   useEffect(() => {
     const level = getLevelById(levelId);
@@ -29,11 +43,17 @@ export default function QuizPage() {
       setCurrentQuiz(randomQuiz);
     }
     
+    // 마법사 대화와 미니게임 설정
+    setWizardDialogue(getWizardDialogueByLevel(levelId));
+    setMinigame(getMinigameByLevel(levelId));
+    
     setSelectedAnswer(null);
     setShowResult(false);
     setShowHint(false);
     setIsCorrect(false);
     setShowReward(false);
+    setGamePhase('intro');
+    setShowWizardHint(false);
   }, [levelId]);
 
   if (!currentLevel || !currentQuiz) {
@@ -56,6 +76,7 @@ export default function QuizPage() {
     } else {
       setIsCorrect(false);
     }
+    handleQuizComplete(answerIndex === currentQuiz.correctAnswer);
   };
 
   const handleNextLevel = () => {
@@ -68,6 +89,50 @@ export default function QuizPage() {
 
   const handleShowHint = () => {
     setShowHint(true);
+  };
+
+  // 새로운 핸들러 함수들
+  const handleIntroComplete = () => {
+    if (hasMinigame) {
+      setGamePhase('minigameIntro');
+    } else {
+      setGamePhase('quiz');
+    }
+  };
+
+  const handleMinigameIntroComplete = () => {
+    setGamePhase('minigame');
+  };
+
+  const handleMinigameComplete = (success: boolean) => {
+    if (success && wizardDialogue) {
+      // 힌트 수집
+      const newHints = {
+        mom: [...collectedHints.mom, wizardDialogue.hints.mom],
+        dad: [...collectedHints.dad, wizardDialogue.hints.dad]
+      };
+      setCollectedHints(newHints);
+    }
+    setGamePhase('minigameOutro');
+  };
+
+  const handleMinigameOutroComplete = () => {
+    setGamePhase('quiz');
+  };
+
+  const handleQuizComplete = (correct: boolean) => {
+    setIsCorrect(correct);
+    setShowResult(true);
+    if (correct) {
+      setTimeout(() => {
+        setGamePhase('result');
+      }, 2000);
+    }
+  };
+
+  const handleWizardHintComplete = () => {
+    setShowWizardHint(false);
+    setGamePhase('result');
   };
 
   return (
@@ -110,28 +175,116 @@ export default function QuizPage() {
           <div className="h-full progress-bar rounded-full"></div>
         </motion.div>
 
-        {/* 스토리 텍스트 */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="quiz-card rounded-3xl p-6 mb-8"
-        >
-          <div className="text-xl font-semibold text-gray-800 mb-4">
-            📖 이야기
-          </div>
-          <div className="text-lg text-gray-700 leading-relaxed">
-            {currentLevel.storyText}
-          </div>
-        </motion.div>
+        {/* 게임 단계에 따른 렌더링 */}
+        <AnimatePresence mode="wait">
+          {gamePhase === 'intro' && wizardDialogue && (
+            <motion.div
+              key="intro"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ delay: 0.2 }}
+            >
+              <WizardDialogueWithState
+                dialogue={wizardDialogue}
+                state="intro"
+                onContinue={handleIntroComplete}
+              />
+            </motion.div>
+          )}
 
-        {/* 퀴즈 카드 */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          className="quiz-card rounded-3xl p-8 mb-6"
-        >
+          {gamePhase === 'minigameIntro' && wizardDialogue && (
+            <motion.div
+              key="minigameIntro"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ delay: 0.2 }}
+            >
+              <WizardDialogueWithState
+                dialogue={wizardDialogue}
+                state="beforeMinigame"
+                onContinue={handleMinigameIntroComplete}
+              />
+            </motion.div>
+          )}
+
+          {gamePhase === 'minigame' && minigame && (
+            <motion.div
+              key="minigame"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ delay: 0.2 }}
+            >
+              <MinigameComponent
+                minigame={minigame}
+                onComplete={handleMinigameComplete}
+              />
+            </motion.div>
+          )}
+
+          {gamePhase === 'minigameOutro' && wizardDialogue && (
+            <motion.div
+              key="minigameOutro"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ delay: 0.2 }}
+            >
+              <WizardDialogueWithState
+                dialogue={wizardDialogue}
+                state="afterMinigame"
+                onContinue={handleMinigameOutroComplete}
+              />
+            </motion.div>
+          )}
+
+          {gamePhase === 'quiz' && (
+            <motion.div
+              key="quiz"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ delay: 0.2 }}
+            >
+              {/* 스토리 텍스트 */}
+              <div className="quiz-card rounded-3xl p-6 mb-8">
+                <div className="text-xl font-semibold text-gray-800 mb-4">
+                  📖 이야기
+                </div>
+                <div className="text-lg text-gray-700 leading-relaxed">
+                  {currentLevel.storyText}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {showWizardHint && wizardDialogue && (
+            <motion.div
+              key="hint"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -30 }}
+              transition={{ delay: 0.2 }}
+            >
+              <WizardDialogue
+                dialogue={wizardDialogue}
+                onContinue={handleWizardHintComplete}
+                showHint={true}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 퀴즈 카드 - quiz 단계에서만 표시 */}
+        {gamePhase === 'quiz' && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4 }}
+            className="quiz-card rounded-3xl p-8 mb-6"
+          >
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
               {currentQuiz.title}
@@ -197,11 +350,13 @@ export default function QuizPage() {
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+          </motion.div>
+        )}
 
-        {/* 결과 표시 */}
-        <AnimatePresence>
-          {showResult && (
+        {/* 결과 표시 - quiz 단계에서만 표시 */}
+        {gamePhase === 'quiz' && (
+          <AnimatePresence>
+            {showResult && (
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -280,8 +435,50 @@ export default function QuizPage() {
                 </div>
               )}
             </motion.div>
-          )}
-        </AnimatePresence>
+            )}
+          </AnimatePresence>
+        )}
+
+        {/* 수집된 힌트 표시 */}
+        {collectedHints.mom.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="quiz-card rounded-3xl p-6 mb-6"
+          >
+            <div className="text-xl font-semibold text-gray-800 mb-4">
+              🗝️ 수집된 힌트들
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-pink-50 rounded-2xl p-4">
+                <div className="text-lg font-semibold text-pink-800 mb-2">
+                  👩 엄마 힌트
+                </div>
+                <ul className="text-gray-700 space-y-1">
+                  {collectedHints.mom.map((hint, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <span className="text-pink-500">•</span>
+                      {hint}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-blue-50 rounded-2xl p-4">
+                <div className="text-lg font-semibold text-blue-800 mb-2">
+                  👨 아빠 힌트
+                </div>
+                <ul className="text-gray-700 space-y-1">
+                  {collectedHints.dad.map((hint, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <span className="text-blue-500">•</span>
+                      {hint}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

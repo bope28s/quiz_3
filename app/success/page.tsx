@@ -106,6 +106,33 @@ export default function SuccessPage() {
             </p>
           </div>
 
+          {/* 가족 위치 힌트 요약 */}
+          <div className="bg-gradient-to-r from-pink-50 to-blue-50 rounded-2xl p-6 mb-6">
+            <div className="text-xl font-semibold text-gray-800 mb-4">
+              🗝️ 수집한 힌트로 찾은 가족의 위치
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-pink-100 rounded-xl p-4">
+                <div className="text-lg font-semibold text-pink-800 mb-2">
+                  👩 엄마는...
+                </div>
+                <div className="text-gray-700">
+                  따뜻하고 부드러운 <span className="font-bold text-pink-600">침실</span>에 있었어요!<br/>
+                  <span className="text-sm text-gray-600">• 따뜻한 곳 • 부드러운 것과 함께 • 달콤한 냄새 • 따뜻한 손길 • 가장 좋아하는 곳</span>
+                </div>
+              </div>
+              <div className="bg-blue-100 rounded-xl p-4">
+                <div className="text-lg font-semibold text-blue-800 mb-2">
+                  👨 아빠는...
+                </div>
+                <div className="text-gray-700">
+                  맛있는 냄새가 나는 <span className="font-bold text-blue-600">부엌</span>에 있었어요!<br/>
+                  <span className="text-sm text-gray-600">• 높은 곳 • 시원한 곳 • 맛있는 냄새 • 강한 팔</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* 달성 통계 */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
             <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 text-white">
