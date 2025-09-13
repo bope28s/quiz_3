@@ -20,14 +20,14 @@ export const minigames: Minigame[] = [
     type: 'jump',
     title: '마법 점프 게임',
     description: '마법사가 당신의 점프 실력을 시험합니다!',
-    instructions: '스페이스바를 눌러서 장애물을 뛰어넘어보세요! 10개를 넘으면 성공!',
+    instructions: '화면을 터치하거나 클릭해서 장애물을 뛰어넘어보세요! 8개를 넘으면 성공!',
     data: {
-      obstacles: 10,
+      obstacles: 8,
       speed: 1.0,
       jumpHeight: 100
     },
     reward: '🎉 훌륭해요! 마법사가 당신의 점프 실력에 감탄했습니다! 다음 단계를 건너뛸 수 있어요!',
-    storyText: '🏃‍♂️ 마법사가 나타났습니다. "스페이스바로 점프해서 장애물을 뛰어넘어보시오! 10개를 넘으면 성공이오!"'
+    storyText: '🏃‍♂️ 마법사가 나타났습니다. "화면을 터치하거나 클릭해서 점프해서 장애물을 뛰어넘어보시오! 8개를 넘으면 성공이오!"'
   },
   
   // 잡기 게임들
@@ -37,14 +37,14 @@ export const minigames: Minigame[] = [
     type: 'catch',
     title: '별 잡기 게임',
     description: '마법사가 당신의 반응 속도를 시험합니다!',
-    instructions: '마우스로 떨어지는 별들을 잡아보세요! 15개를 잡으면 성공!',
+    instructions: '화면을 터치하거나 드래그해서 떨어지는 별들을 잡아보세요! 12개를 잡으면 성공!',
     data: {
-      targets: 15,
+      targets: 12,
       fallSpeed: 2.0,
       spawnRate: 1.5
     },
     reward: '⭐ 훌륭해요! 마법사가 당신의 반응 속도에 감탄했습니다! 다음 단계를 건너뛸 수 있어요!',
-    storyText: '⭐ 마법사가 나타났습니다. "마우스로 떨어지는 별들을 잡아보시오! 15개를 잡으면 성공이오!"'
+    storyText: '⭐ 마법사가 나타났습니다. "화면을 터치하거나 드래그해서 떨어지는 별들을 잡아보시오! 12개를 잡으면 성공이오!"'
   },
   
   // 피하기 게임들
@@ -54,14 +54,14 @@ export const minigames: Minigame[] = [
     type: 'avoid',
     title: '마법 피하기 게임',
     description: '마법사가 당신의 회피 능력을 시험합니다!',
-    instructions: '방향키로 움직여서 떨어지는 돌들을 피해보세요! 30초 동안 살아남으면 성공!',
+    instructions: '화면을 터치하거나 드래그해서 움직여서 떨어지는 돌들을 피해보세요! 25초 동안 살아남으면 성공!',
     data: {
-      duration: 30,
+      duration: 25,
       obstacleSpeed: 3.0,
       spawnRate: 2.0
     },
     reward: '🪨 훌륭해요! 마법사가 당신의 회피 능력에 감탄했습니다! 다음 단계를 건너뛸 수 있어요!',
-    storyText: '🪨 마법사가 나타났습니다. "방향키로 움직여서 떨어지는 돌들을 피해보시오! 30초 동안 살아남으면 성공이오!"'
+    storyText: '🪨 마법사가 나타났습니다. "화면을 터치하거나 드래그해서 움직여서 떨어지는 돌들을 피해보시오! 25초 동안 살아남으면 성공이오!"'
   },
   
   // 수집 게임들
@@ -71,14 +71,14 @@ export const minigames: Minigame[] = [
     type: 'collect',
     title: '보물 수집 게임',
     description: '마법사가 당신의 수집 능력을 시험합니다!',
-    instructions: '방향키로 움직여서 보물들을 수집해보세요! 20개를 모으면 성공!',
+    instructions: '화면을 터치하거나 드래그해서 움직여서 보물들을 수집해보세요! 15개를 모으면 성공!',
     data: {
-      treasures: 20,
+      treasures: 15,
       playerSpeed: 2.5,
       treasureSpawn: 1.0
     },
     reward: '💎 훌륭해요! 마법사가 당신의 수집 능력에 감탄했습니다! 다음 단계를 건너뛸 수 있어요!',
-    storyText: '💎 마법사가 나타났습니다. "방향키로 움직여서 보물들을 수집해보시오! 20개를 모으면 성공이오!"'
+    storyText: '💎 마법사가 나타났습니다. "화면을 터치하거나 드래그해서 움직여서 보물들을 수집해보시오! 15개를 모으면 성공이오!"'
   },
   
   // 슈팅 게임들
@@ -88,14 +88,14 @@ export const minigames: Minigame[] = [
     type: 'shoot',
     title: '마법 슈팅 게임',
     description: '마법사가 당신의 슈팅 실력을 시험합니다!',
-    instructions: '마우스로 클릭해서 날아오는 몬스터들을 쏘아보세요! 25마리를 잡으면 성공!',
+    instructions: '화면을 터치하거나 클릭해서 날아오는 몬스터들을 쏘아보세요! 20마리를 잡으면 성공!',
     data: {
-      targets: 25,
+      targets: 20,
       bulletSpeed: 5.0,
       enemySpeed: 2.0
     },
     reward: '🏹 훌륭해요! 마법사가 당신의 슈팅 실력에 감탄했습니다! 다음 단계를 건너뛸 수 있어요!',
-    storyText: '🏹 마법사가 나타났습니다. "마우스로 클릭해서 날아오는 몬스터들을 쏘아보시오! 25마리를 잡으면 성공이오!"'
+    storyText: '🏹 마법사가 나타났습니다. "화면을 터치하거나 클릭해서 날아오는 몬스터들을 쏘아보시오! 20마리를 잡으면 성공이오!"'
   }
 ];
 

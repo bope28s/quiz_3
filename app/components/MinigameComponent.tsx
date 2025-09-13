@@ -149,7 +149,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
 
     const gameLoop = setInterval(() => {
       // 장애물 생성 (더 흥미로운 패턴)
-      if (Math.random() < 0.015) {
+      if (Math.random() < 0.025) {
         setObstacles(prev => [...prev, { id: Date.now(), x: 800 }]);
       }
 
@@ -326,7 +326,7 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
     const gameLoop = setInterval(() => {
       // 별 생성 (더 흥미로운 패턴)
-      if (Math.random() < 0.025) {
+      if (Math.random() < 0.035) {
         setStars(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -355,8 +355,8 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
           
           setCaughtCount(prev => {
             const newCount = prev + caughtStars.length;
-            onProgress((newCount / 15) * 100);
-            if (newCount >= 15) {
+            onProgress((newCount / 12) * 100);
+            if (newCount >= 12) {
               setGameRunning(false);
               onComplete(true);
             }
@@ -578,7 +578,7 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
 
     const gameLoop = setInterval(() => {
       // 보석 생성 (더 흥미로운 패턴)
-      if (Math.random() < 0.025) {
+      if (Math.random() < 0.035) {
         setGems(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -603,8 +603,8 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
           
           setCollectedCount(prev => {
             const newCount = prev + collectedGems.length;
-            onProgress((newCount / 20) * 100);
-            if (newCount >= 20) {
+            onProgress((newCount / 15) * 100);
+            if (newCount >= 15) {
               setGameRunning(false);
               onComplete(true);
             }
@@ -697,7 +697,7 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
     const gameLoop = setInterval(() => {
       // 타겟 생성 (더 흥미로운 패턴)
-      if (Math.random() < 0.025) {
+      if (Math.random() < 0.035) {
         setTargets(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -739,8 +739,8 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
           
           setHitCount(prev => {
             const newCount = prev + hitBullets.length;
-            onProgress((newCount / 10) * 100);
-            if (newCount >= 10) {
+            onProgress((newCount / 20) * 100);
+            if (newCount >= 20) {
               setGameRunning(false);
               onComplete(true);
             }

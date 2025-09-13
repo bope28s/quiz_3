@@ -79,7 +79,7 @@ export default function Home() {
           <div className="quiz-card rounded-2xl p-6">
             <div className="text-4xl mb-4">🧙‍♂️</div>
             <h3 className="text-xl font-semibold text-gray-800 mb-2">마법사 대화</h3>
-            <p className="text-gray-600">각 관문의 마법사들과 대화하며 힌트를 모아보세요!</p>
+            <p className="text-gray-600">각 관문의 마법사들과 대화하며 문제를 해결해보세요!</p>
           </div>
           <div className="quiz-card rounded-2xl p-6">
             <div className="text-4xl mb-4">🏆</div>
