@@ -35,7 +35,7 @@ export const quizData: Level[] = [
     id: 2,
     title: "한글의 수호자",
     description: "두 번째 관문: 한글을 배워보자!",
-    storyText: "두 번째 관문에서는 한글의 수호자가 지키고 있습니다. 올바른 한글을 찾아서 엄마를 더 가까이 찾아가요!",
+    storyText: "두 번째 관문에서는 한글의 수호자가 지키고 있습니다. 올바른 한글을 찾아서 엄마를 찾아봐요!",
     completed: false,
     category: 'korean'
   },
@@ -198,8 +198,8 @@ export const getRandomQuestion = (level: number, category: string): Quiz => {
     // 레벨 2 - 한글 문제들 (10개)
     {
       id: 11, level: 2, category: 'korean', title: '올바른 한글',
-      question: '다음 중 올바른 한글 단어는 무엇일까요?',
-      options: ['사랑', '사랑이', '사랑해요', '사랑합니다'],
+      question: '다음 중 올바른 한글 표현은 무엇일까요?',
+      options: ['사랑', '사랑이', '사랑해요', '사랑일까요'],
       correctAnswer: 2, hint: '가장 자연스럽고 친근한 표현을 찾아보세요!',
       storyText: '한글의 수호자가 당신의 언어 실력을 시험합니다.',
       rewardText: '완벽해요! 한글의 수호자를 물리쳤습니다.'

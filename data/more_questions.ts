@@ -169,9 +169,9 @@ export const moreQuestions: Quiz[] = [
   // 레벨 8 - 가족 문제들 (10개)
   {
     id: 71, level: 8, category: 'family', title: '가족 관계',
-    question: '아빠의 아들은?',
+    question: '아빠의 딸은?',
     options: ['형', '누나', '나', '엄마'],
-    correctAnswer: 2, hint: '아빠의 아들인 나를 생각해보세요!',
+    correctAnswer: 2, hint: '아빠의 딸인 나를 생각해보세요!',
     storyText: '가족의 마법사가 당신을 시험합니다.',
     rewardText: '훌륭해요! 가족 관계를 잘 알아요.'
   },
@@ -201,9 +201,9 @@ export const moreQuestions: Quiz[] = [
   },
   {
     id: 75, level: 8, category: 'family', title: '형제',
-    question: '형과 누나의 공통점은?',
+    question: '오빠와 언니의 공통점은?',
     options: ['나보다 어리다', '나보다 크다', '나와 같다', '모른다'],
-    correctAnswer: 1, hint: '형과 누나는 나보다 나이가 많아요!',
+    correctAnswer: 1, hint: '오빠와 언니는 나보다 나이가 많아요!',
     storyText: '형제의 마법사가 당신을 시험합니다.',
     rewardText: '훌륭해요! 형제를 잘 알아요.'
   },
