@@ -21,20 +21,6 @@ export interface Level {
   category: string;
 }
 
-// 문제 카테고리별 분류
-const quizCategories = {
-  math: '수학',
-  korean: '한글',
-  animal: '동물',
-  color: '색깔',
-  nature: '자연',
-  food: '음식',
-  body: '몸',
-  family: '가족',
-  daily: '일상',
-  space: '우주'
-};
-
 // 10단계 시스템
 export const quizData: Level[] = [
   {
@@ -121,9 +107,13 @@ export const quizData: Level[] = [
 
 // 랜덤 문제 선택 함수
 export const getRandomQuestion = (level: number, category: string): Quiz => {
-  // 간단한 문제 풀을 만들어서 랜덤으로 반환
+  // 모든 문제를 가져오기
+  const { additionalQuestions } = require('./additional_questions');
+  const { moreQuestions } = require('./more_questions');
+  
+  // 모든 문제를 합치기 (레벨당 10개씩 총 100개)
   const questions: Quiz[] = [
-    // 수학 문제들
+    // 레벨 1 - 수학 문제들 (10개)
     {
       id: 1, level: 1, category: 'math', title: '사과를 세어보세요',
       question: '사과가 5개 있고, 오렌지가 3개 있습니다. 과일은 총 몇 개일까요?',
@@ -141,25 +131,73 @@ export const getRandomQuestion = (level: number, category: string): Quiz => {
       rewardText: '완벽해요! 뺄셈 마법을 익혔습니다.'
     },
     {
-      id: 3, level: 2, category: 'math', title: '곱하기 문제',
-      question: '2 × 3은 얼마일까요?',
+      id: 3, level: 1, category: 'math', title: '덧셈 문제',
+      question: '3 + 4는 얼마일까요?',
+      options: ['6', '7', '8', '9'],
+      correctAnswer: 1, hint: '3 + 4를 계산해보세요!',
+      storyText: '덧셈의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 덧셈을 잘했어요.'
+    },
+    {
+      id: 4, level: 1, category: 'math', title: '뺄셈 문제',
+      question: '9에서 3을 빼면 얼마일까요?',
       options: ['5', '6', '7', '8'],
-      correctAnswer: 1, hint: '2를 3번 더하면 됩니다!',
-      storyText: '곱셈의 마법사가 당신을 시험합니다.',
-      rewardText: '훌륭해요! 곱셈을 마스터했어요.'
+      correctAnswer: 1, hint: '9 - 3을 계산해보세요!',
+      storyText: '뺄셈의 마법사가 당신을 시험합니다.',
+      rewardText: '완벽해요! 뺄셈을 잘했어요.'
     },
     {
-      id: 4, level: 2, category: 'math', title: '나누기 문제',
-      question: '8 ÷ 2는 얼마일까요?',
-      options: ['3', '4', '5', '6'],
-      correctAnswer: 1, hint: '8을 2로 나누어보세요!',
-      storyText: '나눗셈의 마법사가 당신을 시험합니다.',
-      rewardText: '완벽해요! 나눗셈도 할 수 있어요.'
+      id: 5, level: 1, category: 'math', title: '큰 수 찾기',
+      question: '다음 중 가장 큰 수는 무엇일까요?',
+      options: ['15', '25', '20', '30'],
+      correctAnswer: 3, hint: '가장 큰 숫자를 찾아보세요!',
+      storyText: '큰 수의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 큰 수도 잘 알아요.'
     },
-    
-    // 한글 문제들
     {
-      id: 5, level: 1, category: 'korean', title: '올바른 한글',
+      id: 6, level: 1, category: 'math', title: '작은 수 찾기',
+      question: '다음 중 가장 작은 수는 무엇일까요?',
+      options: ['18', '15', '20', '25'],
+      correctAnswer: 1, hint: '가장 작은 숫자를 찾아보세요!',
+      storyText: '작은 수의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 작은 수도 잘 알아요.'
+    },
+    {
+      id: 7, level: 1, category: 'math', title: '덧셈 문제 2',
+      question: '6 + 2는 얼마일까요?',
+      options: ['7', '8', '9', '10'],
+      correctAnswer: 1, hint: '6 + 2를 계산해보세요!',
+      storyText: '덧셈의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 덧셈을 잘했어요.'
+    },
+    {
+      id: 8, level: 1, category: 'math', title: '뺄셈 문제 2',
+      question: '12에서 5를 빼면 얼마일까요?',
+      options: ['6', '7', '8', '9'],
+      correctAnswer: 1, hint: '12 - 5를 계산해보세요!',
+      storyText: '뺄셈의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 뺄셈을 잘했어요.'
+    },
+    {
+      id: 9, level: 1, category: 'math', title: '수 비교',
+      question: '8과 5 중 어느 것이 더 클까요?',
+      options: ['8', '5', '같다', '모른다'],
+      correctAnswer: 0, hint: '8과 5를 비교해보세요!',
+      storyText: '비교의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 수 비교를 잘했어요.'
+    },
+    {
+      id: 10, level: 1, category: 'math', title: '수 세기',
+      question: '1부터 10까지 세어보세요. 10은 몇 번째일까요?',
+      options: ['9번째', '10번째', '11번째', '12번째'],
+      correctAnswer: 1, hint: '1, 2, 3, 4, 5, 6, 7, 8, 9, 10을 세어보세요!',
+      storyText: '세기의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 수 세기를 잘했어요.'
+    },
+
+    // 레벨 2 - 한글 문제들 (10개)
+    {
+      id: 11, level: 2, category: 'korean', title: '올바른 한글',
       question: '다음 중 올바른 한글 단어는 무엇일까요?',
       options: ['사랑', '사랑이', '사랑해요', '사랑합니다'],
       correctAnswer: 2, hint: '가장 자연스럽고 친근한 표현을 찾아보세요!',
@@ -167,7 +205,7 @@ export const getRandomQuestion = (level: number, category: string): Quiz => {
       rewardText: '완벽해요! 한글의 수호자를 물리쳤습니다.'
     },
     {
-      id: 6, level: 1, category: 'korean', title: '한글 자음',
+      id: 12, level: 2, category: 'korean', title: '한글 자음',
       question: '다음 중 자음이 아닌 것은?',
       options: ['ㄱ', 'ㅏ', 'ㄴ', 'ㄷ'],
       correctAnswer: 1, hint: '자음과 모음을 구분해보세요!',
@@ -175,149 +213,73 @@ export const getRandomQuestion = (level: number, category: string): Quiz => {
       rewardText: '훌륭해요! 한글 자음을 잘 알아요.'
     },
     {
-      id: 7, level: 2, category: 'korean', title: '올바른 맞춤법',
+      id: 13, level: 2, category: 'korean', title: '한글 모음',
+      question: '다음 중 모음이 아닌 것은?',
+      options: ['ㅏ', 'ㅓ', 'ㅣ', 'ㄱ'],
+      correctAnswer: 3, hint: '모음과 자음을 구분해보세요!',
+      storyText: '모음의 마법사가 당신을 시험합니다.',
+      rewardText: '완벽해요! 한글 모음을 잘 알아요.'
+    },
+    {
+      id: 14, level: 2, category: 'korean', title: '반대말 찾기',
+      question: '"크다"의 반대말은 무엇일까요?',
+      options: ['높다', '길다', '작다', '넓다'],
+      correctAnswer: 2, hint: '크기의 반대를 생각해보세요!',
+      storyText: '반대말의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 반대말을 잘 알아요.'
+    },
+    {
+      id: 15, level: 2, category: 'korean', title: '뜻 찾기',
+      question: '"기쁘다"와 뜻이 비슷한 말은?',
+      options: ['슬프다', '즐겁다', '화나다', '무섭다'],
+      correctAnswer: 1, hint: '기쁜 마음과 비슷한 느낌을 생각해보세요!',
+      storyText: '뜻의 마법사가 당신을 시험합니다.',
+      rewardText: '완벽해요! 단어의 뜻을 잘 알아요.'
+    },
+    {
+      id: 16, level: 2, category: 'korean', title: '올바른 맞춤법',
       question: '다음 중 올바른 맞춤법은?',
       options: ['아버지', '아버찌', '아버지이', '아버지야'],
       correctAnswer: 0, hint: '가장 기본적이고 올바른 표기를 찾아보세요!',
       storyText: '맞춤법의 마법사가 당신을 시험합니다.',
       rewardText: '훌륭해요! 맞춤법을 잘 알아요.'
     },
-    
-    // 동물 문제들
     {
-      id: 8, level: 1, category: 'animal', title: '동물 구분',
-      question: '다음 중 물고기가 아닌 동물은 무엇일까요?',
-      options: ['고래', '상어', '펭귄', '금붕어'],
-      correctAnswer: 2, hint: '물 속에서 사는 동물이 아닌 것을 찾아보세요!',
-      storyText: '동물의 친구가 당신의 자연 지식을 시험합니다.',
-      rewardText: '훌륭해요! 동물을 잘 구분해요.'
+      id: 17, level: 2, category: 'korean', title: '단어 완성',
+      question: '"학교"와 함께 사용하는 올바른 단어는?',
+      options: ['학교에', '학교가', '학교를', '학교와'],
+      correctAnswer: 0, hint: '장소를 나타내는 조사를 생각해보세요!',
+      storyText: '조사의 마법사가 당신을 시험합니다.',
+      rewardText: '완벽해요! 조사를 잘 사용해요.'
     },
     {
-      id: 9, level: 1, category: 'animal', title: '동물 소리',
-      question: '고양이가 내는 소리는?',
-      options: ['멍멍', '야옹', '음메', '꿀꿀'],
-      correctAnswer: 1, hint: '고양이 소리를 생각해보세요!',
-      storyText: '동물 소리의 마법사가 당신을 시험합니다.',
-      rewardText: '완벽해요! 동물 소리를 잘 알아요.'
+      id: 18, level: 2, category: 'korean', title: '동사 찾기',
+      question: '다음 중 동사는?',
+      options: ['예쁘다', '크다', '먹다', '좋다'],
+      correctAnswer: 2, hint: '행동을 나타내는 단어를 찾아보세요!',
+      storyText: '동사의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 동사를 잘 구분해요.'
     },
     {
-      id: 10, level: 2, category: 'animal', title: '동물 특징',
-      question: '다음 중 날개가 있는 동물은?',
-      options: ['개', '고양이', '새', '물고기'],
-      correctAnswer: 2, hint: '하늘을 날 수 있는 동물을 생각해보세요!',
-      storyText: '동물 특징의 마법사가 당신을 시험합니다.',
-      rewardText: '훌륭해요! 동물 특징을 잘 알아요.'
-    },
-    
-    // 색깔 문제들
-    {
-      id: 11, level: 1, category: 'color', title: '기본 색깔',
-      question: '노란색과 파란색을 섞으면 어떤 색이 될까요?',
-      options: ['빨간색', '초록색', '보라색', '주황색'],
-      correctAnswer: 1, hint: '자연에서 볼 수 있는 색깔을 생각해보세요!',
-      storyText: '색깔의 마법사가 당신의 색깔 지식을 시험합니다.',
-      rewardText: '훌륭해요! 색깔을 잘 섞어요.'
+      id: 19, level: 2, category: 'korean', title: '형용사 찾기',
+      question: '다음 중 형용사는?',
+      options: ['가다', '오다', '예쁘다', '먹다'],
+      correctAnswer: 2, hint: '상태나 성질을 나타내는 단어를 찾아보세요!',
+      storyText: '형용사의 마법사가 당신을 시험합니다.',
+      rewardText: '완벽해요! 형용사를 잘 구분해요.'
     },
     {
-      id: 12, level: 1, category: 'color', title: '빨간색 물체',
-      question: '다음 중 빨간색인 것은?',
-      options: ['하늘', '풀', '사과', '바다'],
-      correctAnswer: 2, hint: '빨간색 과일을 생각해보세요!',
-      storyText: '빨간색의 마법사가 당신을 시험합니다.',
-      rewardText: '완벽해요! 빨간색을 잘 알아요.'
+      id: 20, level: 2, category: 'korean', title: '의미 찾기',
+      question: '"따뜻하다"와 뜻이 비슷한 말은?',
+      options: ['차갑다', '뜨겁다', '시원하다', '덥다'],
+      correctAnswer: 1, hint: '따뜻한 느낌과 비슷한 온도를 생각해보세요!',
+      storyText: '의미의 마법사가 당신을 시험합니다.',
+      rewardText: '훌륭해요! 단어의 의미를 잘 알아요.'
     },
     
-    // 자연 문제들
-    {
-      id: 13, level: 1, category: 'nature', title: '계절',
-      question: '꽃이 피고 나비가 날아다니는 계절은?',
-      options: ['봄', '여름', '가을', '겨울'],
-      correctAnswer: 0, hint: '새싹이 돋고 꽃이 피는 계절을 생각해보세요!',
-      storyText: '계절의 마법사가 당신을 시험합니다.',
-      rewardText: '훌륭해요! 계절을 잘 알아요.'
-    },
-    {
-      id: 14, level: 2, category: 'nature', title: '날씨',
-      question: '하늘에서 물방울이 떨어지는 날씨는?',
-      options: ['맑음', '비', '눈', '바람'],
-      correctAnswer: 1, hint: '물방울이 떨어지는 날씨를 생각해보세요!',
-      storyText: '날씨의 마법사가 당신을 시험합니다.',
-      rewardText: '완벽해요! 날씨를 잘 알아요.'
-    },
-    
-    // 음식 문제들
-    {
-      id: 15, level: 1, category: 'food', title: '과일',
-      question: '다음 중 과일은?',
-      options: ['당근', '사과', '양파', '감자'],
-      correctAnswer: 1, hint: '달콤하고 씹어먹는 과일을 생각해보세요!',
-      storyText: '과일의 마법사가 당신을 시험합니다.',
-      rewardText: '훌륭해요! 과일을 잘 알아요.'
-    },
-    {
-      id: 16, level: 2, category: 'food', title: '채소',
-      question: '다음 중 채소는?',
-      options: ['사과', '바나나', '당근', '포도'],
-      correctAnswer: 2, hint: '땅에서 자라고 샐러드로 먹는 것을 생각해보세요!',
-      storyText: '채소의 마법사가 당신을 시험합니다.',
-      rewardText: '완벽해요! 채소를 잘 알아요.'
-    },
-    
-    // 몸 문제들
-    {
-      id: 17, level: 1, category: 'body', title: '몸 부위',
-      question: '음식을 맛보는 기관은?',
-      options: ['코', '귀', '혀', '눈'],
-      correctAnswer: 2, hint: '입 안에 있고 맛을 느끼는 기관을 생각해보세요!',
-      storyText: '몸의 마법사가 당신을 시험합니다.',
-      rewardText: '훌륭해요! 몸 부위를 잘 알아요.'
-    },
-    {
-      id: 18, level: 2, category: 'body', title: '몸 기능',
-      question: '숨을 쉬는 기관은?',
-      options: ['심장', '폐', '간', '콩팥'],
-      correctAnswer: 1, hint: '공기를 들이마시고 내쉬는 기관을 생각해보세요!',
-      storyText: '기능의 마법사가 당신을 시험합니다.',
-      rewardText: '완벽해요! 몸 기능을 잘 알아요.'
-    },
-    
-    // 가족 문제들
-    {
-      id: 19, level: 1, category: 'family', title: '가족 관계',
-      question: '아빠의 아들은?',
-      options: ['형', '누나', '나', '엄마'],
-      correctAnswer: 2, hint: '아빠의 아들인 나를 생각해보세요!',
-      storyText: '가족의 마법사가 당신을 시험합니다.',
-      rewardText: '훌륭해요! 가족 관계를 잘 알아요.'
-    },
-    {
-      id: 20, level: 10, category: 'family', title: '가족 사랑',
-      question: '가장 중요한 것은 무엇일까요?',
-      options: ['돈', '장난감', '가족의 사랑', '맛있는 음식'],
-      correctAnswer: 2, hint: '마음으로 느끼는 가장 소중한 것을 생각해보세요!',
-      storyText: '사랑의 마법사가 당신을 시험합니다.',
-      rewardText: '완벽해요! 가족의 사랑을 잘 알아요.'
-    },
-    
-    // 일상 문제들
-    {
-      id: 21, level: 1, category: 'daily', title: '일상 활동',
-      question: '아침에 일어나서 하는 첫 번째 일은?',
-      options: ['씻기', '옷 입기', '눈 뜨기', '먹기'],
-      correctAnswer: 2, hint: '잠에서 깨어나서 하는 첫 번째 일을 생각해보세요!',
-      storyText: '일상의 마법사가 당신을 시험합니다.',
-      rewardText: '훌륭해요! 일상을 잘 알아요.'
-    },
-    
-    // 우주 문제들
-    {
-      id: 22, level: 1, category: 'space', title: '우주',
-      question: '지구에서 가장 가까운 별은?',
-      options: ['달', '태양', '별', '행성'],
-      correctAnswer: 1, hint: '하늘에서 가장 크고 밝게 보이는 것을 생각해보세요!',
-      storyText: '우주의 마법사가 당신을 시험합니다.',
-      rewardText: '훌륭해요! 우주를 잘 알아요.'
-    }
+    // 추가 문제들 포함
+    ...additionalQuestions,
+    ...moreQuestions
   ];
   
   // 해당 레벨과 카테고리에 맞는 문제 필터링
