@@ -49,14 +49,14 @@ export default function MinigameComponent({ minigame, onComplete }: MinigameComp
       case 'shoot':
         return <ShootGame minigame={minigame} onComplete={handleGameEnd} onProgress={setGameProgress} />;
       default:
-        return <div>게임을 불러올 수 없습니다.</div>;
+        return <div>게임을 찾을 수 없습니다.</div>;
     }
   };
 
   if (gameState === 'intro') {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         className="quiz-card rounded-3xl p-8 text-center"
       >
@@ -134,7 +134,7 @@ export default function MinigameComponent({ minigame, onComplete }: MinigameComp
   );
 }
 
-// 점프 게임 컴포넌트
+// 점프 게임 컴포넌트 (모바일 지원)
 function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; onComplete: (success: boolean) => void; onProgress: (progress: number) => void }) {
   const [playerY, setPlayerY] = useState(200);
   const [isJumping, setIsJumping] = useState(false);
@@ -146,7 +146,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 장애물 생성 (더 정확한 타이밍)
+      // 장애물 생성
       if (Math.random() < 0.015) {
         setObstacles(prev => [...prev, { id: Date.now(), x: 800 }]);
       }
@@ -156,7 +156,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
         const newObstacles = prev.map(obs => ({ ...obs, x: obs.x - 4 }));
         const filteredObstacles = newObstacles.filter(obs => obs.x > -50);
         
-        // 점프 완료 체크 (장애물이 화면을 완전히 벗어났을 때)
+        // 점프 완료 체크
         const completedObstacles = prev.filter(obs => obs.x <= -50 && obs.x > -100);
         if (completedObstacles.length > 0) {
           setJumpCount(prev => {
@@ -173,7 +173,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
         return filteredObstacles;
       });
 
-      // 충돌 검사 (더 정확한 범위)
+      // 충돌 검사
       obstacles.forEach(obs => {
         const playerLeft = 50;
         const playerRight = 58;
@@ -209,6 +209,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
     }
   };
 
+  // 키보드 이벤트 (데스크톱)
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.code === 'Space') {
@@ -221,11 +222,22 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isJumping]);
 
+  // 터치 이벤트 (모바일)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    handleJump();
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    handleJump();
+  };
+
   return (
-    <div className="relative w-full h-64 bg-gradient-to-b from-blue-400 to-green-400 rounded-2xl overflow-hidden">
+    <div className="relative w-full h-64 bg-gradient-to-b from-blue-400 to-green-400 rounded-2xl overflow-hidden touch-none">
       {/* 플레이어 */}
       <motion.div
-        className="absolute w-8 h-8 bg-red-500 rounded-full"
+        className="absolute w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold"
         style={{ left: 50, top: playerY }}
         animate={{ y: isJumping ? -100 : 0 }}
         transition={{ duration: 0.5 }}
@@ -237,7 +249,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
       {obstacles.map(obs => (
         <div
           key={obs.id}
-          className="absolute w-6 h-16 bg-gray-600 rounded"
+          className="absolute w-6 h-16 bg-gray-600 rounded flex items-center justify-center"
           style={{ left: obs.x, top: 180 }}
         >
           🚧
@@ -247,104 +259,139 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
       {/* 지면 */}
       <div className="absolute bottom-0 w-full h-4 bg-green-600"></div>
       
-      <div className="absolute top-4 left-4 text-white font-bold">
+      {/* 점수 표시 */}
+      <div className="absolute top-4 left-4 text-white font-bold bg-black bg-opacity-50 px-3 py-1 rounded">
         점프: {jumpCount}/{minigame.data.obstacles}
+      </div>
+
+      {/* 점프 버튼 (모바일 친화적) */}
+      <div className="absolute bottom-4 right-4">
+        <button
+          onClick={handleClick}
+          onTouchStart={handleTouchStart}
+          className="bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg touch-manipulation select-none"
+          style={{ minHeight: '50px', minWidth: '100px' }}
+        >
+          점프! 🦘
+        </button>
+      </div>
+
+      {/* 모바일 안내 */}
+      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
+        터치!
       </div>
     </div>
   );
 }
 
-// 잡기 게임 컴포넌트
+// 잡기 게임 컴포넌트 (모바일 지원)
 function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; onComplete: (success: boolean) => void; onProgress: (progress: number) => void }) {
   const [stars, setStars] = useState<Array<{id: number, x: number, y: number}>>([]);
+  const [playerX, setPlayerX] = useState(400);
   const [caughtCount, setCaughtCount] = useState(0);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [gameRunning, setGameRunning] = useState(true);
 
   useEffect(() => {
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 별 생성 (더 적절한 빈도)
-      if (Math.random() < 0.08) {
+      // 별 생성
+      if (Math.random() < 0.02) {
         setStars(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
-          y: 0 
+          y: -20 
         }]);
       }
 
       // 별 이동 및 제거
       setStars(prev => {
-        const newStars = prev.map(star => ({ ...star, y: star.y + 2.5 }));
-        return newStars.filter(star => star.y < 300);
-      });
-
-      // 잡기 검사 (더 정확한 거리 계산)
-      setStars(prev => {
-        const newStars = prev.filter(star => {
-          const distance = Math.sqrt(Math.pow(star.x - mousePos.x, 2) + Math.pow(star.y - mousePos.y, 2));
-          if (distance < 25) {
-            setCaughtCount(prev => {
-              const newCount = prev + 1;
-              onProgress((newCount / minigame.data.targets) * 100);
-              if (newCount >= minigame.data.targets) {
-                setGameRunning(false);
-                onComplete(true);
-              }
-              return newCount;
-            });
-            return false;
-          }
-          return true;
+        const newStars = prev.map(star => ({ ...star, y: star.y + 3 }));
+        const filteredStars = newStars.filter(star => star.y < 300);
+        
+        // 잡힌 별 체크
+        const caughtStars = prev.filter(star => {
+          const distance = Math.sqrt(
+            Math.pow(star.x - playerX, 2) + Math.pow(star.y - 250, 2)
+          );
+          return distance < 30;
         });
-        return newStars;
+        
+        if (caughtStars.length > 0) {
+          setCaughtCount(prev => {
+            const newCount = prev + caughtStars.length;
+            onProgress((newCount / 15) * 100);
+            if (newCount >= 15) {
+              setGameRunning(false);
+              onComplete(true);
+            }
+            return newCount;
+          });
+        }
+        
+        return filteredStars;
       });
     }, 50);
 
     return () => clearInterval(gameLoop);
-  }, [mousePos, minigame.data.targets, onComplete, onProgress, gameRunning]);
+  }, [playerX, onComplete, onProgress, gameRunning]);
 
+  // 마우스/터치 이벤트
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    setPlayerX(e.clientX - rect.left);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const touch = e.touches[0];
+    setPlayerX(touch.clientX - rect.left);
   };
 
   return (
     <div 
-      className="relative w-full h-64 bg-gradient-to-b from-purple-400 to-pink-400 rounded-2xl overflow-hidden cursor-crosshair"
+      className="relative w-full h-64 bg-gradient-to-b from-purple-400 to-pink-400 rounded-2xl overflow-hidden touch-none"
       onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
     >
+      {/* 플레이어 */}
+      <div 
+        className="absolute w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold"
+        style={{ left: playerX - 24, top: 250 }}
+      >
+        🧙‍♂️
+      </div>
+
       {/* 별들 */}
       {stars.map(star => (
-        <motion.div
+        <div
           key={star.id}
-          className="absolute text-2xl"
+          className="absolute w-6 h-6 text-yellow-300 text-2xl"
           style={{ left: star.x, top: star.y }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
         >
           ⭐
-        </motion.div>
+        </div>
       ))}
 
-      {/* 마우스 커서 */}
-      <div 
-        className="absolute w-8 h-8 border-2 border-white rounded-full pointer-events-none"
-        style={{ left: mousePos.x - 16, top: mousePos.y - 16 }}
-      ></div>
+      {/* 점수 표시 */}
+      <div className="absolute top-4 left-4 text-white font-bold bg-black bg-opacity-50 px-3 py-1 rounded">
+        잡은 별: {caughtCount}/15
+      </div>
 
-      <div className="absolute top-4 left-4 text-white font-bold">
-        잡은 별: {caughtCount}/{minigame.data.targets}
+      {/* 모바일 안내 */}
+      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
+        드래그!
       </div>
     </div>
   );
 }
 
-// 피하기 게임 컴포넌트
+// 피하기 게임 컴포넌트 (모바일 지원)
 function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; onComplete: (success: boolean) => void; onProgress: (progress: number) => void }) {
-  const [playerPos, setPlayerPos] = useState({ x: 200, y: 200 });
-  const [rocks, setRocks] = useState<Array<{id: number, x: number, y: number}>>([]);
+  const [playerX, setPlayerX] = useState(400);
+  const [playerY, setPlayerY] = useState(200);
+  const [enemies, setEnemies] = useState<Array<{id: number, x: number, y: number}>>([]);
   const [survivedTime, setSurvivedTime] = useState(0);
   const [gameRunning, setGameRunning] = useState(true);
 
@@ -353,96 +400,97 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
     const gameLoop = setInterval(() => {
       setSurvivedTime(prev => {
-        const newTime = prev + 0.05;
-        onProgress((newTime / minigame.data.duration) * 100);
-        if (newTime >= minigame.data.duration) {
+        const newTime = prev + 1;
+        onProgress((newTime / 300) * 100); // 5분 = 300초
+        if (newTime >= 300) {
           setGameRunning(false);
           onComplete(true);
         }
         return newTime;
       });
 
-      // 돌 생성 (더 적절한 빈도)
-      if (Math.random() < 0.08) {
-        setRocks(prev => [...prev, { 
+      // 적 생성
+      if (Math.random() < 0.03) {
+        setEnemies(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
-          y: 0 
+          y: Math.random() * 200 
         }]);
       }
 
-      // 돌 이동 및 제거
-      setRocks(prev => {
-        const newRocks = prev.map(rock => ({ ...rock, y: rock.y + 3.5 }));
-        return newRocks.filter(rock => rock.y < 300);
-      });
-
-      // 충돌 검사 (더 정확한 거리)
-      rocks.forEach(rock => {
-        const distance = Math.sqrt(Math.pow(rock.x - playerPos.x, 2) + Math.pow(rock.y - playerPos.y, 2));
+      // 충돌 검사
+      enemies.forEach(enemy => {
+        const distance = Math.sqrt(
+          Math.pow(enemy.x - playerX, 2) + Math.pow(enemy.y - playerY, 2)
+        );
         if (distance < 25) {
           setGameRunning(false);
           onComplete(false);
         }
       });
-    }, 50);
+    }, 100);
 
     return () => clearInterval(gameLoop);
-  }, [rocks, playerPos, minigame.data.duration, onComplete, onProgress, gameRunning]);
+  }, [playerX, playerY, enemies, onComplete, onProgress, gameRunning]);
 
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      setPlayerPos(prev => {
-        let newX = prev.x;
-        let newY = prev.y;
-        
-        switch(e.key) {
-          case 'ArrowLeft': newX = Math.max(20, prev.x - 10); break;
-          case 'ArrowRight': newX = Math.min(680, prev.x + 10); break;
-          case 'ArrowUp': newY = Math.max(20, prev.y - 10); break;
-          case 'ArrowDown': newY = Math.min(180, prev.y + 10); break;
-        }
-        
-        return { x: newX, y: newY };
-      });
-    };
+  // 마우스/터치 이벤트
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPlayerX(e.clientX - rect.left);
+    setPlayerY(e.clientY - rect.top);
+  };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const touch = e.touches[0];
+    setPlayerX(touch.clientX - rect.left);
+    setPlayerY(touch.clientY - rect.top);
+  };
 
   return (
-    <div className="relative w-full h-64 bg-gradient-to-b from-gray-400 to-gray-600 rounded-2xl overflow-hidden">
+    <div 
+      className="relative w-full h-64 bg-gradient-to-b from-red-400 to-orange-400 rounded-2xl overflow-hidden touch-none"
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
+    >
       {/* 플레이어 */}
-      <div
-        className="absolute w-8 h-8 bg-blue-500 rounded-full"
-        style={{ left: playerPos.x, top: playerPos.y }}
+      <div 
+        className="absolute w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold"
+        style={{ left: playerX - 20, top: playerY - 20 }}
       >
-        🏃
+        🛡️
       </div>
 
-      {/* 돌들 */}
-      {rocks.map(rock => (
+      {/* 적들 */}
+      {enemies.map(enemy => (
         <div
-          key={rock.id}
-          className="absolute w-6 h-6 bg-gray-800 rounded"
-          style={{ left: rock.x, top: rock.y }}
+          key={enemy.id}
+          className="absolute w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white"
+          style={{ left: enemy.x, top: enemy.y }}
         >
-          🪨
+          💀
         </div>
       ))}
 
-      <div className="absolute top-4 left-4 text-white font-bold">
-        생존 시간: {Math.floor(survivedTime)}초 / {minigame.data.duration}초
+      {/* 점수 표시 */}
+      <div className="absolute top-4 left-4 text-white font-bold bg-black bg-opacity-50 px-3 py-1 rounded">
+        생존: {Math.floor(survivedTime / 10)}초
+      </div>
+
+      {/* 모바일 안내 */}
+      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
+        드래그!
       </div>
     </div>
   );
 }
 
-// 수집 게임 컴포넌트
+// 수집 게임 컴포넌트 (모바일 지원)
 function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame; onComplete: (success: boolean) => void; onProgress: (progress: number) => void }) {
-  const [playerPos, setPlayerPos] = useState({ x: 200, y: 200 });
-  const [treasures, setTreasures] = useState<Array<{id: number, x: number, y: number}>>([]);
+  const [gems, setGems] = useState<Array<{id: number, x: number, y: number}>>([]);
+  const [playerX, setPlayerX] = useState(400);
+  const [playerY, setPlayerY] = useState(200);
   const [collectedCount, setCollectedCount] = useState(0);
   const [gameRunning, setGameRunning] = useState(true);
 
@@ -450,203 +498,248 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 보물 생성 (더 적절한 빈도)
-      if (Math.random() < 0.06) {
-        setTreasures(prev => [...prev, { 
+      // 보석 생성
+      if (Math.random() < 0.02) {
+        setGems(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
-          y: Math.random() * 200 + 50 
+          y: Math.random() * 200 
         }]);
       }
 
-      // 수집 검사 (더 정확한 거리)
-      setTreasures(prev => {
-        const newTreasures = prev.filter(treasure => {
-          const distance = Math.sqrt(Math.pow(treasure.x - playerPos.x, 2) + Math.pow(treasure.y - playerPos.y, 2));
-          if (distance < 25) {
-            setCollectedCount(prev => {
-              const newCount = prev + 1;
-              onProgress((newCount / minigame.data.treasures) * 100);
-              if (newCount >= minigame.data.treasures) {
-                setGameRunning(false);
-                onComplete(true);
-              }
-              return newCount;
-            });
-            return false;
-          }
-          return true;
+      // 수집 체크
+      setGems(prev => {
+        const collectedGems = prev.filter(gem => {
+          const distance = Math.sqrt(
+            Math.pow(gem.x - playerX, 2) + Math.pow(gem.y - playerY, 2)
+          );
+          return distance < 30;
         });
-        return newTreasures;
+        
+        if (collectedGems.length > 0) {
+          setCollectedCount(prev => {
+            const newCount = prev + collectedGems.length;
+            onProgress((newCount / 20) * 100);
+            if (newCount >= 20) {
+              setGameRunning(false);
+              onComplete(true);
+            }
+            return newCount;
+          });
+        }
+        
+        return prev.filter(gem => {
+          const distance = Math.sqrt(
+            Math.pow(gem.x - playerX, 2) + Math.pow(gem.y - playerY, 2)
+          );
+          return distance >= 30;
+        });
       });
     }, 50);
 
     return () => clearInterval(gameLoop);
-  }, [playerPos, minigame.data.treasures, onComplete, onProgress, gameRunning]);
+  }, [playerX, playerY, onComplete, onProgress, gameRunning]);
 
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      setPlayerPos(prev => {
-        let newX = prev.x;
-        let newY = prev.y;
-        
-        switch(e.key) {
-          case 'ArrowLeft': newX = Math.max(20, prev.x - 10); break;
-          case 'ArrowRight': newX = Math.min(680, prev.x + 10); break;
-          case 'ArrowUp': newY = Math.max(20, prev.y - 10); break;
-          case 'ArrowDown': newY = Math.min(180, prev.y + 10); break;
-        }
-        
-        return { x: newX, y: newY };
-      });
-    };
+  // 마우스/터치 이벤트
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPlayerX(e.clientX - rect.left);
+    setPlayerY(e.clientY - rect.top);
+  };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, []);
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const touch = e.touches[0];
+    setPlayerX(touch.clientX - rect.left);
+    setPlayerY(touch.clientY - rect.top);
+  };
 
   return (
-    <div className="relative w-full h-64 bg-gradient-to-b from-yellow-400 to-orange-400 rounded-2xl overflow-hidden">
+    <div 
+      className="relative w-full h-64 bg-gradient-to-b from-indigo-400 to-purple-400 rounded-2xl overflow-hidden touch-none"
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
+    >
       {/* 플레이어 */}
-      <div
-        className="absolute w-8 h-8 bg-green-500 rounded-full"
-        style={{ left: playerPos.x, top: playerPos.y }}
+      <div 
+        className="absolute w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold"
+        style={{ left: playerX - 24, top: playerY - 24 }}
       >
-        🏃
+        🏃‍♂️
       </div>
 
-      {/* 보물들 */}
-      {treasures.map(treasure => (
-        <motion.div
-          key={treasure.id}
-          className="absolute text-2xl"
-          style={{ left: treasure.x, top: treasure.y }}
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
+      {/* 보석들 */}
+      {gems.map(gem => (
+        <div
+          key={gem.id}
+          className="absolute w-8 h-8 text-pink-500 text-2xl"
+          style={{ left: gem.x, top: gem.y }}
         >
           💎
-        </motion.div>
+        </div>
       ))}
 
-      <div className="absolute top-4 left-4 text-white font-bold">
-        수집한 보물: {collectedCount}/{minigame.data.treasures}
+      {/* 점수 표시 */}
+      <div className="absolute top-4 left-4 text-white font-bold bg-black bg-opacity-50 px-3 py-1 rounded">
+        수집: {collectedCount}/20
+      </div>
+
+      {/* 모바일 안내 */}
+      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
+        드래그!
       </div>
     </div>
   );
 }
 
-// 슈팅 게임 컴포넌트
+// 슈팅 게임 컴포넌트 (모바일 지원)
 function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; onComplete: (success: boolean) => void; onProgress: (progress: number) => void }) {
-  const [enemies, setEnemies] = useState<Array<{id: number, x: number, y: number}>>([]);
   const [bullets, setBullets] = useState<Array<{id: number, x: number, y: number}>>([]);
-  const [killedCount, setKilledCount] = useState(0);
+  const [targets, setTargets] = useState<Array<{id: number, x: number, y: number}>>([]);
+  const [playerX, setPlayerX] = useState(400);
+  const [hitCount, setHitCount] = useState(0);
   const [gameRunning, setGameRunning] = useState(true);
 
   useEffect(() => {
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 적 생성 (더 적절한 빈도)
-      if (Math.random() < 0.06) {
-        setEnemies(prev => [...prev, { 
+      // 타겟 생성
+      if (Math.random() < 0.02) {
+        setTargets(prev => [...prev, { 
           id: Date.now(), 
-          x: 800, 
-          y: Math.random() * 200 + 50 
+          x: Math.random() * 700, 
+          y: Math.random() * 200 
         }]);
       }
 
-      // 적 이동 및 제거
-      setEnemies(prev => {
-        const newEnemies = prev.map(enemy => ({ ...enemy, x: enemy.x - 2.5 }));
-        return newEnemies.filter(enemy => enemy.x > -50);
-      });
+      // 총알 이동
+      setBullets(prev => prev.map(bullet => ({ ...bullet, y: bullet.y - 5 })).filter(bullet => bullet.y > -10));
 
-      // 총알 이동 및 제거
+      // 타겟 이동
+      setTargets(prev => prev.map(target => ({ ...target, y: target.y + 2 })).filter(target => target.y < 300));
+
+      // 충돌 검사
       setBullets(prev => {
-        const newBullets = prev.map(bullet => ({ ...bullet, x: bullet.x + 7 }));
-        return newBullets.filter(bullet => bullet.x < 800);
-      });
-
-      // 충돌 검사 (더 정확한 거리)
-      setEnemies(prev => {
-        const newEnemies = prev.filter(enemy => {
-          const hit = bullets.some(bullet => {
-            const distance = Math.sqrt(Math.pow(enemy.x - bullet.x, 2) + Math.pow(enemy.y - bullet.y, 2));
-            return distance < 18;
+        const hitBullets = prev.filter(bullet => {
+          const hitTarget = targets.find(target => {
+            const distance = Math.sqrt(
+              Math.pow(bullet.x - target.x, 2) + Math.pow(bullet.y - target.y, 2)
+            );
+            return distance < 20;
           });
-          
-          if (hit) {
-            setKilledCount(prev => {
-              const newCount = prev + 1;
-              onProgress((newCount / minigame.data.targets) * 100);
-              if (newCount >= minigame.data.targets) {
-                setGameRunning(false);
-                onComplete(true);
-              }
-              return newCount;
-            });
-            return false;
-          }
-          return true;
+          return hitTarget;
         });
-        return newEnemies;
+        
+        if (hitBullets.length > 0) {
+          setHitCount(prev => {
+            const newCount = prev + hitBullets.length;
+            onProgress((newCount / 10) * 100);
+            if (newCount >= 10) {
+              setGameRunning(false);
+              onComplete(true);
+            }
+            return newCount;
+          });
+        }
+        
+        return prev.filter(bullet => {
+          const hitTarget = targets.find(target => {
+            const distance = Math.sqrt(
+              Math.pow(bullet.x - target.x, 2) + Math.pow(bullet.y - target.y, 2)
+            );
+            return distance < 20;
+          });
+          return !hitTarget;
+        });
       });
-
-      // 총알과 적 충돌 시 총알 제거
-      setBullets(prev => prev.filter(bullet => {
-        const hit = enemies.some(enemy => {
-          const distance = Math.sqrt(Math.pow(enemy.x - bullet.x, 2) + Math.pow(enemy.y - bullet.y, 2));
-          return distance < 18;
-        });
-        return !hit;
-      }));
     }, 50);
 
     return () => clearInterval(gameLoop);
-  }, [enemies, bullets, minigame.data.targets, onComplete, onProgress, gameRunning]);
+  }, [targets, onComplete, onProgress, gameRunning]);
 
-  const handleShoot = (e: React.MouseEvent) => {
+  const shoot = () => {
+    setBullets(prev => [...prev, { id: Date.now(), x: playerX, y: 250 }]);
+  };
+
+  // 마우스/터치 이벤트
+  const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    setBullets(prev => [...prev, { id: Date.now(), x: 50, y: y }]);
+    setPlayerX(e.clientX - rect.left);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
+    const rect = e.currentTarget.getBoundingClientRect();
+    const touch = e.touches[0];
+    setPlayerX(touch.clientX - rect.left);
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    shoot();
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    shoot();
   };
 
   return (
     <div 
-      className="relative w-full h-64 bg-gradient-to-b from-red-400 to-purple-400 rounded-2xl overflow-hidden cursor-crosshair"
-      onClick={handleShoot}
+      className="relative w-full h-64 bg-gradient-to-b from-gray-600 to-gray-800 rounded-2xl overflow-hidden touch-none"
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
     >
-      {/* 적들 */}
-      {enemies.map(enemy => (
-        <div
-          key={enemy.id}
-          className="absolute w-8 h-8 bg-red-600 rounded"
-          style={{ left: enemy.x, top: enemy.y }}
-        >
-          👹
-        </div>
-      ))}
+      {/* 플레이어 */}
+      <div 
+        className="absolute w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold"
+        style={{ left: playerX - 24, top: 250 }}
+      >
+        🚀
+      </div>
 
       {/* 총알들 */}
       {bullets.map(bullet => (
         <div
           key={bullet.id}
-          className="absolute w-2 h-2 bg-yellow-400 rounded-full"
+          className="absolute w-2 h-6 bg-yellow-400 rounded"
           style={{ left: bullet.x, top: bullet.y }}
+        />
+      ))}
+
+      {/* 타겟들 */}
+      {targets.map(target => (
+        <div
+          key={target.id}
+          className="absolute w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white"
+          style={{ left: target.x, top: target.y }}
         >
-          💥
+          🎯
         </div>
       ))}
 
-      {/* 플레이어 */}
-      <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-2xl">
-        🏹
+      {/* 점수 표시 */}
+      <div className="absolute top-4 left-4 text-white font-bold bg-black bg-opacity-50 px-3 py-1 rounded">
+        명중: {hitCount}/10
       </div>
 
-      <div className="absolute top-4 left-4 text-white font-bold">
-        처치한 적: {killedCount}/{minigame.data.targets}
+      {/* 슈팅 버튼 */}
+      <div className="absolute bottom-4 right-4">
+        <button
+          onClick={handleClick}
+          onTouchStart={handleTouchStart}
+          className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg touch-manipulation select-none"
+          style={{ minHeight: '50px', minWidth: '100px' }}
+        >
+          발사! 🔫
+        </button>
+      </div>
+
+      {/* 모바일 안내 */}
+      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
+        터치!
       </div>
     </div>
   );
