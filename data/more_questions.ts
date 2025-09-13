@@ -170,7 +170,7 @@ export const moreQuestions: Quiz[] = [
   {
     id: 71, level: 8, category: 'family', title: '가족 관계',
     question: '아빠의 딸은?',
-    options: ['형', '누나', '나', '엄마'],
+    options: ['오빠', '이모', '나', '엄마'],
     correctAnswer: 2, hint: '아빠의 딸인 나를 생각해보세요!',
     storyText: '가족의 마법사가 당신을 시험합니다.',
     rewardText: '훌륭해요! 가족 관계를 잘 알아요.'
