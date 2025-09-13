@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import BackgroundMusic from './components/BackgroundMusic'
 
 export const metadata: Metadata = {
   title: '엄마 아빠 구출 대작전 🦸‍♂️',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        {children}
+        <BackgroundMusic />
+      </body>
     </html>
   )
 }

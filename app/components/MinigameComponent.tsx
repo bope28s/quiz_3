@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minigame } from '@/data/minigames';
+import ParticleEffect, { createExplosionParticles, createStarParticles, createGemParticles, createHitParticles } from './ParticleEffect';
 
 interface MinigameComponentProps {
   minigame: Minigame;
@@ -141,6 +142,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
   const [obstacles, setObstacles] = useState<Array<{id: number, x: number}>>([]);
   const [jumpCount, setJumpCount] = useState(0);
   const [gameRunning, setGameRunning] = useState(true);
+  const [particles, setParticles] = useState<any[]>([]);
 
   useEffect(() => {
     if (!gameRunning) return;
@@ -159,6 +161,11 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
         // 점프 완료 체크 (더 정확한 범위)
         const completedObstacles = prev.filter(obs => obs.x <= -25 && obs.x > -75);
         if (completedObstacles.length > 0) {
+          // 파티클 효과 추가
+          completedObstacles.forEach(obs => {
+            setParticles(prev => [...prev, ...createStarParticles(obs.x, 200, 3)]);
+          });
+          
           setJumpCount(prev => {
             const newCount = prev + completedObstacles.length;
             onProgress((newCount / minigame.data.obstacles) * 100);
@@ -249,11 +256,18 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
 
   return (
     <div className="relative w-full h-64 bg-gradient-to-b from-blue-400 to-green-400 rounded-2xl overflow-hidden touch-none">
+      {/* 파티클 효과 */}
+      <ParticleEffect particles={particles} onParticleUpdate={setParticles} />
+      
       {/* 플레이어 */}
       <motion.div
         className="absolute w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold"
         style={{ left: 50, top: playerY }}
-        animate={{ y: isJumping ? -100 : 0 }}
+        animate={{ 
+          y: isJumping ? -100 : 0,
+          scale: isJumping ? 1.2 : 1,
+          rotate: isJumping ? 360 : 0
+        }}
         transition={{ duration: 0.5 }}
       >
         🏃
@@ -305,6 +319,7 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
   const [playerX, setPlayerX] = useState(400);
   const [caughtCount, setCaughtCount] = useState(0);
   const [gameRunning, setGameRunning] = useState(true);
+  const [particles, setParticles] = useState<any[]>([]);
 
   useEffect(() => {
     if (!gameRunning) return;
@@ -333,6 +348,11 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         });
         
         if (caughtStars.length > 0) {
+          // 파티클 효과 추가
+          caughtStars.forEach(star => {
+            setParticles(prev => [...prev, ...createStarParticles(star.x, star.y, 4)]);
+          });
+          
           setCaughtCount(prev => {
             const newCount = prev + caughtStars.length;
             onProgress((newCount / 15) * 100);
@@ -385,13 +405,25 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
       onTouchStart={(e) => e.preventDefault()}
       onTouchEnd={(e) => e.preventDefault()}
     >
+      {/* 파티클 효과 */}
+      <ParticleEffect particles={particles} onParticleUpdate={setParticles} />
+      
       {/* 플레이어 */}
-      <div 
+      <motion.div 
         className="absolute w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold"
         style={{ left: playerX - 24, top: 250 }}
+        animate={{ 
+          scale: [1, 1.1, 1],
+          rotate: [0, 5, -5, 0]
+        }}
+        transition={{ 
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
       >
         🧙‍♂️
-      </div>
+      </motion.div>
 
       {/* 별들 */}
       {stars.map(star => (
@@ -423,6 +455,7 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
   const [enemies, setEnemies] = useState<Array<{id: number, x: number, y: number}>>([]);
   const [survivedTime, setSurvivedTime] = useState(0);
   const [gameRunning, setGameRunning] = useState(true);
+  const [particles, setParticles] = useState<any[]>([]);
 
   useEffect(() => {
     if (!gameRunning) return;
@@ -488,13 +521,25 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
       onTouchStart={(e) => e.preventDefault()}
       onTouchEnd={(e) => e.preventDefault()}
     >
+      {/* 파티클 효과 */}
+      <ParticleEffect particles={particles} onParticleUpdate={setParticles} />
+      
       {/* 플레이어 */}
-      <div 
+      <motion.div 
         className="absolute w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold"
         style={{ left: playerX - 20, top: playerY - 20 }}
+        animate={{ 
+          scale: [1, 1.05, 1],
+          rotate: [0, 5, -5, 0]
+        }}
+        transition={{ 
+          duration: 2,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
       >
         🛡️
-      </div>
+      </motion.div>
 
       {/* 적들 */}
       {enemies.map(enemy => (
@@ -526,6 +571,7 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
   const [playerY, setPlayerY] = useState(200);
   const [collectedCount, setCollectedCount] = useState(0);
   const [gameRunning, setGameRunning] = useState(true);
+  const [particles, setParticles] = useState<any[]>([]);
 
   useEffect(() => {
     if (!gameRunning) return;
@@ -550,6 +596,11 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
         });
         
         if (collectedGems.length > 0) {
+          // 파티클 효과 추가
+          collectedGems.forEach(gem => {
+            setParticles(prev => [...prev, ...createGemParticles(gem.x, gem.y, 5)]);
+          });
+          
           setCollectedCount(prev => {
             const newCount = prev + collectedGems.length;
             onProgress((newCount / 20) * 100);
@@ -599,6 +650,8 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
       onTouchStart={(e) => e.preventDefault()}
       onTouchEnd={(e) => e.preventDefault()}
     >
+      {/* 파티클 효과 */}
+      <ParticleEffect particles={particles} onParticleUpdate={setParticles} />
       {/* 플레이어 */}
       <div 
         className="absolute w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center text-white font-bold"
@@ -637,6 +690,7 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
   const [playerX, setPlayerX] = useState(400);
   const [hitCount, setHitCount] = useState(0);
   const [gameRunning, setGameRunning] = useState(true);
+  const [particles, setParticles] = useState<any[]>([]);
 
   useEffect(() => {
     if (!gameRunning) return;
@@ -670,6 +724,19 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         });
         
         if (hitBullets.length > 0) {
+          // 파티클 효과 추가
+          hitBullets.forEach(bullet => {
+            const hitTarget = targets.find(target => {
+              const distance = Math.sqrt(
+                Math.pow(bullet.x - target.x, 2) + Math.pow(bullet.y - target.y, 2)
+              );
+              return distance < 25;
+            });
+            if (hitTarget) {
+              setParticles(prev => [...prev, ...createHitParticles(hitTarget.x, hitTarget.y, 6)]);
+            }
+          });
+          
           setHitCount(prev => {
             const newCount = prev + hitBullets.length;
             onProgress((newCount / 10) * 100);
@@ -743,13 +810,25 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
       onTouchStart={(e) => e.preventDefault()}
       onTouchEnd={(e) => e.preventDefault()}
     >
+      {/* 파티클 효과 */}
+      <ParticleEffect particles={particles} onParticleUpdate={setParticles} />
+      
       {/* 플레이어 */}
-      <div 
+      <motion.div 
         className="absolute w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold"
         style={{ left: playerX - 24, top: 250 }}
+        animate={{ 
+          scale: [1, 1.1, 1],
+          rotate: [0, 10, -10, 0]
+        }}
+        transition={{ 
+          duration: 1.5,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
       >
         🚀
-      </div>
+      </motion.div>
 
       {/* 총알들 */}
       {bullets.map(bullet => (
