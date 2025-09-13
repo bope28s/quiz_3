@@ -134,3 +134,44 @@ export const createHitParticles = (x: number, y: number, count: number = 4): Par
   
   return particles;
 };
+
+export const createSparkleParticles = (x: number, y: number, count: number = 6): Particle[] => {
+  const particles: Particle[] = [];
+  const colors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'];
+  
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      id: Date.now() + i + Math.random(),
+      x: x + (Math.random() - 0.5) * 30,
+      y: y + (Math.random() - 0.5) * 30,
+      vx: (Math.random() - 0.5) * 2,
+      vy: -Math.random() * 4 - 1,
+      life: 800,
+      maxLife: 800,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      size: 3 + Math.random() * 4,
+    });
+  }
+  
+  return particles;
+};
+
+export const createTrailParticles = (x: number, y: number, count: number = 3): Particle[] => {
+  const particles: Particle[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      id: Date.now() + i + Math.random(),
+      x: x + (Math.random() - 0.5) * 10,
+      y: y + (Math.random() - 0.5) * 10,
+      vx: (Math.random() - 0.5) * 1,
+      vy: (Math.random() - 0.5) * 1,
+      life: 300,
+      maxLife: 300,
+      color: '#ffffff',
+      size: 1 + Math.random() * 2,
+    });
+  }
+  
+  return particles;
+};

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minigame } from '@/data/minigames';
-import ParticleEffect, { createExplosionParticles, createStarParticles, createGemParticles, createHitParticles } from './ParticleEffect';
+import ParticleEffect, { createExplosionParticles, createStarParticles, createGemParticles, createHitParticles, createSparkleParticles, createTrailParticles } from './ParticleEffect';
 
 interface MinigameComponentProps {
   minigame: Minigame;
@@ -163,7 +163,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
         if (completedObstacles.length > 0) {
           // 파티클 효과 추가
           completedObstacles.forEach(obs => {
-            setParticles(prev => [...prev, ...createStarParticles(obs.x, 200, 3)]);
+            setParticles(prev => [...prev, ...createSparkleParticles(obs.x, 200, 5)]);
           });
           
           setJumpCount(prev => {
@@ -350,13 +350,13 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         if (caughtStars.length > 0) {
           // 파티클 효과 추가
           caughtStars.forEach(star => {
-            setParticles(prev => [...prev, ...createStarParticles(star.x, star.y, 4)]);
+            setParticles(prev => [...prev, ...createSparkleParticles(star.x, star.y, 6)]);
           });
           
           setCaughtCount(prev => {
             const newCount = prev + caughtStars.length;
-            onProgress((newCount / 12) * 100);
-            if (newCount >= 12) {
+            onProgress((newCount / 10) * 100);
+            if (newCount >= 10) {
               setGameRunning(false);
               onComplete(true);
             }
@@ -386,9 +386,9 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
     if (gameRunning) {
+      e.preventDefault();
+      e.stopPropagation();
       const rect = e.currentTarget.getBoundingClientRect();
       const touch = e.touches[0];
       if (touch) {
@@ -432,8 +432,16 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
           className="absolute w-6 h-6 text-yellow-300 text-2xl"
           style={{ left: star.x, top: star.y }}
           initial={{ scale: 0, rotate: 0 }}
-          animate={{ scale: 1, rotate: 360 }}
-          transition={{ duration: 0.3 }}
+          animate={{ 
+            scale: [0, 1.2, 1],
+            rotate: [0, 180, 360],
+            y: [0, -5, 0]
+          }}
+          transition={{ 
+            duration: 0.5,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
         >
           ⭐
         </motion.div>
@@ -497,19 +505,23 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
   // 마우스/터치 이벤트
   const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPlayerX(e.clientX - rect.left);
-    setPlayerY(e.clientY - rect.top);
+    if (gameRunning) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setPlayerX(e.clientX - rect.left);
+      setPlayerY(e.clientY - rect.top);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    const touch = e.touches[0];
-    if (touch) {
-      setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
-      setPlayerY(Math.max(0, Math.min(200, touch.clientY - rect.top)));
+    if (gameRunning) {
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = e.currentTarget.getBoundingClientRect();
+      const touch = e.touches[0];
+      if (touch) {
+        setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+        setPlayerY(Math.max(0, Math.min(200, touch.clientY - rect.top)));
+      }
     }
   };
 
@@ -598,13 +610,13 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
         if (collectedGems.length > 0) {
           // 파티클 효과 추가
           collectedGems.forEach(gem => {
-            setParticles(prev => [...prev, ...createGemParticles(gem.x, gem.y, 5)]);
+            setParticles(prev => [...prev, ...createSparkleParticles(gem.x, gem.y, 7)]);
           });
           
           setCollectedCount(prev => {
             const newCount = prev + collectedGems.length;
-            onProgress((newCount / 15) * 100);
-            if (newCount >= 15) {
+            onProgress((newCount / 12) * 100);
+            if (newCount >= 12) {
               setGameRunning(false);
               onComplete(true);
             }
@@ -626,19 +638,23 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
 
   // 마우스/터치 이벤트
   const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPlayerX(e.clientX - rect.left);
-    setPlayerY(e.clientY - rect.top);
+    if (gameRunning) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setPlayerX(e.clientX - rect.left);
+      setPlayerY(e.clientY - rect.top);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    const touch = e.touches[0];
-    if (touch) {
-      setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
-      setPlayerY(Math.max(0, Math.min(200, touch.clientY - rect.top)));
+    if (gameRunning) {
+      e.preventDefault();
+      e.stopPropagation();
+      const rect = e.currentTarget.getBoundingClientRect();
+      const touch = e.touches[0];
+      if (touch) {
+        setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+        setPlayerY(Math.max(0, Math.min(200, touch.clientY - rect.top)));
+      }
     }
   };
 
@@ -667,8 +683,16 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
           className="absolute w-8 h-8 text-pink-500 text-2xl"
           style={{ left: gem.x, top: gem.y }}
           initial={{ scale: 0, rotate: 0 }}
-          animate={{ scale: 1, rotate: 180 }}
-          transition={{ duration: 0.4 }}
+          animate={{ 
+            scale: [0, 1.3, 1],
+            rotate: [0, 360, 720],
+            y: [0, -8, 0]
+          }}
+          transition={{ 
+            duration: 0.6,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
         >
           💎
         </motion.div>
@@ -733,14 +757,14 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
               return distance < 25;
             });
             if (hitTarget) {
-              setParticles(prev => [...prev, ...createHitParticles(hitTarget.x, hitTarget.y, 6)]);
+              setParticles(prev => [...prev, ...createExplosionParticles(hitTarget.x, hitTarget.y, 8)]);
             }
           });
           
           setHitCount(prev => {
             const newCount = prev + hitBullets.length;
-            onProgress((newCount / 20) * 100);
-            if (newCount >= 20) {
+            onProgress((newCount / 15) * 100);
+            if (newCount >= 15) {
               setGameRunning(false);
               onComplete(true);
             }
@@ -764,7 +788,9 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
   }, [targets, onComplete, onProgress, gameRunning]);
 
   const shoot = () => {
-    setBullets(prev => [...prev, { id: Date.now(), x: playerX, y: 250 }]);
+    if (gameRunning) {
+      setBullets(prev => [...prev, { id: Date.now() + Math.random(), x: playerX, y: 250 }]);
+    }
   };
 
   // 마우스/터치 이벤트
@@ -776,9 +802,9 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
     if (gameRunning) {
+      e.preventDefault();
+      e.stopPropagation();
       const rect = e.currentTarget.getBoundingClientRect();
       const touch = e.touches[0];
       if (touch) {
@@ -788,16 +814,16 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
     if (gameRunning) {
+      e.preventDefault();
       shoot();
     }
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
     if (gameRunning) {
+      e.preventDefault();
+      e.stopPropagation();
       shoot();
     }
   };
