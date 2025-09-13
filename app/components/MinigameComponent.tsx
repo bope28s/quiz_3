@@ -295,10 +295,6 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
         </button>
       </div>
 
-      {/* 모바일 안내 */}
-      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
-        터치!
-      </div>
     </div>
   );
 }
@@ -329,7 +325,7 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         const filteredStars = newStars.filter(star => star.y < 300);
         
         // 잡힌 별 체크 (더 정확한 거리)
-        const caughtStars = prev.filter(star => {
+        const caughtStars = filteredStars.filter(star => {
           const distance = Math.sqrt(
             Math.pow(star.x - playerX, 2) + Math.pow(star.y - 250, 2)
           );
@@ -348,7 +344,13 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
           });
         }
         
-        return filteredStars;
+        // 잡힌 별들을 제거하고 반환
+        return filteredStars.filter(star => {
+          const distance = Math.sqrt(
+            Math.pow(star.x - playerX, 2) + Math.pow(star.y - 250, 2)
+          );
+          return distance >= 35;
+        });
       });
     }, 40); // 더 빠른 업데이트
 
@@ -380,6 +382,8 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
       className="relative w-full h-64 bg-gradient-to-b from-purple-400 to-pink-400 rounded-2xl overflow-hidden touch-none"
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
+      onTouchStart={(e) => e.preventDefault()}
+      onTouchEnd={(e) => e.preventDefault()}
     >
       {/* 플레이어 */}
       <div 
@@ -408,10 +412,6 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         잡은 별: {caughtCount}/15
       </div>
 
-      {/* 모바일 안내 */}
-      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
-        드래그!
-      </div>
     </div>
   );
 }
@@ -485,6 +485,8 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
       className="relative w-full h-64 bg-gradient-to-b from-red-400 to-orange-400 rounded-2xl overflow-hidden touch-none"
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
+      onTouchStart={(e) => e.preventDefault()}
+      onTouchEnd={(e) => e.preventDefault()}
     >
       {/* 플레이어 */}
       <div 
@@ -513,10 +515,6 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         생존: {Math.floor(survivedTime / 10)}초
       </div>
 
-      {/* 모바일 안내 */}
-      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
-        드래그!
-      </div>
     </div>
   );
 }
@@ -598,6 +596,8 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
       className="relative w-full h-64 bg-gradient-to-b from-indigo-400 to-purple-400 rounded-2xl overflow-hidden touch-none"
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
+      onTouchStart={(e) => e.preventDefault()}
+      onTouchEnd={(e) => e.preventDefault()}
     >
       {/* 플레이어 */}
       <div 
@@ -626,10 +626,6 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
         수집: {collectedCount}/20
       </div>
 
-      {/* 모바일 안내 */}
-      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
-        드래그!
-      </div>
     </div>
   );
 }
@@ -744,6 +740,8 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
       className="relative w-full h-64 bg-gradient-to-b from-gray-600 to-gray-800 rounded-2xl overflow-hidden touch-none"
       onMouseMove={handleMouseMove}
       onTouchMove={handleTouchMove}
+      onTouchStart={(e) => e.preventDefault()}
+      onTouchEnd={(e) => e.preventDefault()}
     >
       {/* 플레이어 */}
       <div 
@@ -794,10 +792,6 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         </button>
       </div>
 
-      {/* 모바일 안내 */}
-      <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-sm md:hidden">
-        터치!
-      </div>
     </div>
   );
 }
