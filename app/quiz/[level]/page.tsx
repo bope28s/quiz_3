@@ -143,7 +143,7 @@ export default function QuizPage() {
 
           {/* 선택지 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {currentQuiz.options.map((option, index) => (
+            {currentQuiz.options.map((option: string, index: number) => (
               <motion.button
                 key={index}
                 initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
