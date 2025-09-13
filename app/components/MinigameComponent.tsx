@@ -225,11 +225,13 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
   // 터치 이벤트 (모바일)
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     handleJump();
   };
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     handleJump();
   };
 
@@ -344,9 +346,12 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
   const handleTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     const touch = e.touches[0];
-    setPlayerX(touch.clientX - rect.left);
+    if (touch) {
+      setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+    }
   };
 
   return (
@@ -442,10 +447,13 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
   const handleTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     const touch = e.touches[0];
-    setPlayerX(touch.clientX - rect.left);
-    setPlayerY(touch.clientY - rect.top);
+    if (touch) {
+      setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+      setPlayerY(Math.max(0, Math.min(200, touch.clientY - rect.top)));
+    }
   };
 
   return (
@@ -549,10 +557,13 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
 
   const handleTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     const touch = e.touches[0];
-    setPlayerX(touch.clientX - rect.left);
-    setPlayerY(touch.clientY - rect.top);
+    if (touch) {
+      setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+      setPlayerY(Math.max(0, Math.min(200, touch.clientY - rect.top)));
+    }
   };
 
   return (
@@ -671,9 +682,12 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
   const handleTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     const rect = e.currentTarget.getBoundingClientRect();
     const touch = e.touches[0];
-    setPlayerX(touch.clientX - rect.left);
+    if (touch) {
+      setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+    }
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -683,6 +697,7 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     shoot();
   };
 
