@@ -121,7 +121,7 @@ export default function Home() {
             <Heart className="w-6 h-6 text-red-500" />
           </div>
           <div className="text-sm">
-            총 10개의 관문을 통과하면 엄마와 아빠를 구출할 수 있습니다! 💪
+            총 7개의 관문을 통과하면 엄마와 아빠를 구출할 수 있습니다! 💪
           </div>
         </motion.div>
       </motion.div>

@@ -98,7 +98,7 @@ export default function SuccessPage() {
               어둠의 마법사가 가둔 엄마와 아빠를 성공적으로 구출했습니다!
             </p>
             <p className="mb-4">
-              총 <span className="font-bold text-purple-600">10개의 관문</span>을 통과하며
+              총 <span className="font-bold text-purple-600">7개의 관문</span>을 통과하며
               용기와 지혜를 보여주었어요.
             </p>
             <p>
@@ -106,28 +106,28 @@ export default function SuccessPage() {
             </p>
           </div>
 
-          {/* 가족 위치 힌트 요약 */}
+          {/* 가족 구출 성공 메시지 */}
           <div className="bg-gradient-to-r from-pink-50 to-blue-50 rounded-2xl p-6 mb-6">
             <div className="text-xl font-semibold text-gray-800 mb-4">
-              🗝️ 수집한 힌트로 찾은 가족의 위치
+              🎉 가족 구출 성공! 🎉
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-pink-100 rounded-xl p-4">
                 <div className="text-lg font-semibold text-pink-800 mb-2">
-                  👩 엄마는...
+                  👩 엄마를 구출했어요!
                 </div>
                 <div className="text-gray-700">
-                  따뜻하고 부드러운 <span className="font-bold text-pink-600">침실</span>에 있었어요!<br/>
-                  <span className="text-sm text-gray-600">• 따뜻한 곳 • 부드러운 것과 함께 • 달콤한 냄새 • 따뜻한 손길 • 가장 좋아하는 곳</span>
+                  따뜻하고 안전한 곳에서 무사히 구출했습니다!<br/>
+                  <span className="text-sm text-gray-600">• 따뜻한 마음 • 부드러운 사랑 • 달콤한 미소</span>
                 </div>
               </div>
               <div className="bg-blue-100 rounded-xl p-4">
                 <div className="text-lg font-semibold text-blue-800 mb-2">
-                  👨 아빠는...
+                  👨 아빠를 구출했어요!
                 </div>
                 <div className="text-gray-700">
-                  맛있는 냄새가 나는 <span className="font-bold text-blue-600">부엌</span>에 있었어요!<br/>
-                  <span className="text-sm text-gray-600">• 높은 곳 • 시원한 곳 • 맛있는 냄새 • 강한 팔</span>
+                  강인한 마음으로 무사히 구출했습니다!<br/>
+                  <span className="text-sm text-gray-600">• 강한 사랑 • 따뜻한 포옹 • 든든한 지지</span>
                 </div>
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function SuccessPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
             <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 text-white">
               <Trophy className="w-8 h-8 mx-auto mb-2" />
-              <div className="text-2xl font-bold">10</div>
+              <div className="text-2xl font-bold">7</div>
               <div className="text-sm">관문 완주</div>
             </div>
             <div className="bg-gradient-to-br from-pink-400 to-purple-500 rounded-2xl p-6 text-white">

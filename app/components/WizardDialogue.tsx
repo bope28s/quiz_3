@@ -170,7 +170,7 @@ export function WizardDialogueWithState({
   onContinue 
 }: { 
   dialogue: WizardDialogueType; 
-  state: 'intro' | 'beforeQuiz' | 'afterCorrect' | 'afterIncorrect' | 'beforeMinigame' | 'afterMinigame' | 'farewell';
+  state: 'intro' | 'beforeQuiz' | 'afterCorrect' | 'afterIncorrect' | 'beforeMinigame' | 'afterMinigameSuccess' | 'afterMinigameFailure' | 'farewell';
   onContinue: () => void;
 }) {
   const [currentText, setCurrentText] = useState('');

@@ -9,7 +9,7 @@ import { getLevelById, getTotalLevels, getRandomQuestion } from '@/data/quizzes'
 import { getMinigameByLevel } from '@/data/minigames';
 import { getWizardDialogueByLevel } from '@/data/wizardDialogues';
 import MinigameComponent from '@/app/components/MinigameComponent';
-import WizardDialogue, { WizardDialogueWithState } from '@/app/components/WizardDialogue';
+import { WizardDialogueWithState } from '@/app/components/WizardDialogue';
 
 export default function QuizPage() {
   const params = useParams();
@@ -21,17 +21,15 @@ export default function QuizPage() {
   const [showResult, setShowResult] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [showReward, setShowReward] = useState(false);
   
   // 새로운 상태들
-  const [gamePhase, setGamePhase] = useState<'intro' | 'minigame' | 'minigameIntro' | 'minigameOutro' | 'quiz' | 'result'>('intro');
+  const [gamePhase, setGamePhase] = useState<'intro' | 'minigame' | 'minigameIntro' | 'minigameOutro' | 'quiz'>('intro');
   const [wizardDialogue, setWizardDialogue] = useState(getWizardDialogueByLevel(levelId));
   const [minigame, setMinigame] = useState(getMinigameByLevel(levelId));
-  const [collectedHints, setCollectedHints] = useState<{mom: string[], dad: string[]}>({mom: [], dad: []});
-  const [showWizardHint, setShowWizardHint] = useState(false);
+  const [minigameSuccess, setMinigameSuccess] = useState<boolean>(false);
   
-  // 미니게임이 있는 레벨인지 확인
-  const hasMinigame = [1, 5, 10].includes(levelId);
+  // 미니게임이 있는 레벨인지 확인 (스킵 기능)
+  const hasMinigame = [2, 5].includes(levelId);
 
   useEffect(() => {
     const level = getLevelById(levelId);
@@ -51,9 +49,7 @@ export default function QuizPage() {
     setShowResult(false);
     setShowHint(false);
     setIsCorrect(false);
-    setShowReward(false);
     setGamePhase('intro');
-    setShowWizardHint(false);
   }, [levelId]);
 
   if (!currentLevel || !currentQuiz) {
@@ -70,13 +66,9 @@ export default function QuizPage() {
     setSelectedAnswer(answerIndex);
     setShowResult(true);
     
-    if (answerIndex === currentQuiz.correctAnswer) {
-      setIsCorrect(true);
-      setTimeout(() => setShowReward(true), 1500);
-    } else {
-      setIsCorrect(false);
-    }
-    handleQuizComplete(answerIndex === currentQuiz.correctAnswer);
+    const isCorrect = answerIndex === currentQuiz.correctAnswer;
+    setIsCorrect(isCorrect);
+    handleQuizComplete(isCorrect);
   };
 
   const handleNextLevel = () => {
@@ -105,35 +97,32 @@ export default function QuizPage() {
   };
 
   const handleMinigameComplete = (success: boolean) => {
-    if (success && wizardDialogue) {
-      // 힌트 수집
-      const newHints = {
-        mom: [...collectedHints.mom, wizardDialogue.hints.mom],
-        dad: [...collectedHints.dad, wizardDialogue.hints.dad]
-      };
-      setCollectedHints(newHints);
+    setMinigameSuccess(success);
+    if (success) {
+      // 미니게임 성공 시 다음 단계로 스킵
+      setGamePhase('minigameOutro');
+    } else {
+      // 미니게임 실패 시 퀴즈로 진행
+      setGamePhase('quiz');
     }
-    setGamePhase('minigameOutro');
   };
 
   const handleMinigameOutroComplete = () => {
-    setGamePhase('quiz');
+    if (minigameSuccess) {
+      // 미니게임 성공 시 다음 단계로 스킵
+      handleNextLevel();
+    } else {
+      // 미니게임 실패 시 퀴즈로 진행
+      setGamePhase('quiz');
+    }
   };
 
   const handleQuizComplete = (correct: boolean) => {
     setIsCorrect(correct);
     setShowResult(true);
-    if (correct) {
-      setTimeout(() => {
-        setGamePhase('result');
-      }, 2000);
-    }
+    // 정답이든 오답이든 결과를 바로 표시
   };
 
-  const handleWizardHintComplete = () => {
-    setShowWizardHint(false);
-    setGamePhase('result');
-  };
 
   return (
     <div className="min-h-screen p-4">
@@ -234,57 +223,42 @@ export default function QuizPage() {
             >
               <WizardDialogueWithState
                 dialogue={wizardDialogue}
-                state="afterMinigame"
+                state={minigameSuccess ? "afterMinigameSuccess" : "afterMinigameFailure"}
                 onContinue={handleMinigameOutroComplete}
               />
             </motion.div>
           )}
 
           {gamePhase === 'quiz' && (
-            <motion.div
+        <motion.div
               key="quiz"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -30 }}
-              transition={{ delay: 0.2 }}
-            >
+          transition={{ delay: 0.2 }}
+        >
               {/* 스토리 텍스트 */}
               <div className="quiz-card rounded-3xl p-6 mb-8">
-                <div className="text-xl font-semibold text-gray-800 mb-4">
-                  📖 이야기
+          <div className="text-xl font-semibold text-gray-800 mb-4">
+            📖 이야기
+          </div>
+          <div className="text-lg text-gray-700 leading-relaxed">
+            {currentLevel.storyText}
                 </div>
-                <div className="text-lg text-gray-700 leading-relaxed">
-                  {currentLevel.storyText}
-                </div>
-              </div>
-            </motion.div>
+          </div>
+        </motion.div>
           )}
 
-          {showWizardHint && wizardDialogue && (
-            <motion.div
-              key="hint"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -30 }}
-              transition={{ delay: 0.2 }}
-            >
-              <WizardDialogue
-                dialogue={wizardDialogue}
-                onContinue={handleWizardHintComplete}
-                showHint={true}
-              />
-            </motion.div>
-          )}
         </AnimatePresence>
 
         {/* 퀴즈 카드 - quiz 단계에서만 표시 */}
         {gamePhase === 'quiz' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-            className="quiz-card rounded-3xl p-8 mb-6"
-          >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.4 }}
+          className="quiz-card rounded-3xl p-8 mb-6"
+        >
           <div className="text-center mb-6">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
               {currentQuiz.title}
@@ -350,13 +324,13 @@ export default function QuizPage() {
               </motion.div>
             )}
           </AnimatePresence>
-          </motion.div>
+        </motion.div>
         )}
 
         {/* 결과 표시 - quiz 단계에서만 표시 */}
         {gamePhase === 'quiz' && (
-          <AnimatePresence>
-            {showResult && (
+        <AnimatePresence>
+          {showResult && (
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -435,50 +409,10 @@ export default function QuizPage() {
                 </div>
               )}
             </motion.div>
-            )}
-          </AnimatePresence>
+          )}
+        </AnimatePresence>
         )}
 
-        {/* 수집된 힌트 표시 */}
-        {collectedHints.mom.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="quiz-card rounded-3xl p-6 mb-6"
-          >
-            <div className="text-xl font-semibold text-gray-800 mb-4">
-              🗝️ 수집된 힌트들
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-pink-50 rounded-2xl p-4">
-                <div className="text-lg font-semibold text-pink-800 mb-2">
-                  👩 엄마 힌트
-                </div>
-                <ul className="text-gray-700 space-y-1">
-                  {collectedHints.mom.map((hint, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <span className="text-pink-500">•</span>
-                      {hint}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="bg-blue-50 rounded-2xl p-4">
-                <div className="text-lg font-semibold text-blue-800 mb-2">
-                  👨 아빠 힌트
-                </div>
-                <ul className="text-gray-700 space-y-1">
-                  {collectedHints.dad.map((hint, index) => (
-                    <li key={index} className="flex items-center gap-2">
-                      <span className="text-blue-500">•</span>
-                      {hint}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-        )}
       </div>
     </div>
   );
