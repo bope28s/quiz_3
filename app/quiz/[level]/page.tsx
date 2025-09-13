@@ -391,7 +391,7 @@ export default function QuizPage() {
                     아쉽게 틀렸어요
                   </h3>
                   <div className="text-xl text-gray-700 mb-6">
-                    다시 도전해보세요! 힌트 버튼을 눌러서 도움을 받아보세요! 💪
+                    다시 도전해보세요! 조금 더 생각해보면 정답을 찾을 수 있을 거예요! 💪
                   </div>
                   <motion.button
                     initial={{ opacity: 0 }}

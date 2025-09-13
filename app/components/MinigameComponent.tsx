@@ -146,7 +146,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 장애물 생성
+      // 장애물 생성 (더 흥미로운 패턴)
       if (Math.random() < 0.015) {
         setObstacles(prev => [...prev, { id: Date.now(), x: 800 }]);
       }
@@ -156,8 +156,8 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
         const newObstacles = prev.map(obs => ({ ...obs, x: obs.x - 4 }));
         const filteredObstacles = newObstacles.filter(obs => obs.x > -50);
         
-        // 점프 완료 체크
-        const completedObstacles = prev.filter(obs => obs.x <= -50 && obs.x > -100);
+        // 점프 완료 체크 (더 정확한 범위)
+        const completedObstacles = prev.filter(obs => obs.x <= -25 && obs.x > -75);
         if (completedObstacles.length > 0) {
           setJumpCount(prev => {
             const newCount = prev + completedObstacles.length;
@@ -173,7 +173,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
         return filteredObstacles;
       });
 
-      // 충돌 검사
+      // 충돌 검사 (더 정확한 바운딩 박스)
       obstacles.forEach(obs => {
         const playerLeft = 50;
         const playerRight = 58;
@@ -185,27 +185,29 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
         const obstacleTop = 180;
         const obstacleBottom = 236;
         
+        // 더 정확한 충돌 감지
         if (playerRight > obstacleLeft && 
             playerLeft < obstacleRight && 
             playerBottom > obstacleTop && 
-            playerTop < obstacleBottom) {
+            playerTop < obstacleBottom &&
+            !isJumping) { // 점프 중일 때는 충돌 무시
           setGameRunning(false);
           onComplete(false);
         }
       });
-    }, 50);
+    }, 30); // 더 빠른 업데이트로 반응성 향상
 
     return () => clearInterval(gameLoop);
-  }, [obstacles, playerY, minigame.data.obstacles, onComplete, onProgress, gameRunning]);
+  }, [obstacles, playerY, minigame.data.obstacles, onComplete, onProgress, gameRunning, isJumping]);
 
   const handleJump = () => {
-    if (!isJumping) {
+    if (!isJumping && gameRunning) {
       setIsJumping(true);
       setPlayerY(100);
       setTimeout(() => {
         setPlayerY(200);
         setIsJumping(false);
-      }, 500);
+      }, 450); // 약간 더 빠른 점프
     }
   };
 
@@ -222,17 +224,27 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isJumping]);
 
-  // 터치 이벤트 (모바일)
+  // 터치 이벤트 (모바일) - 더 정밀한 처리
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    handleJump();
+    if (gameRunning) {
+      handleJump();
+    }
   };
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    handleJump();
+    if (gameRunning) {
+      handleJump();
+    }
+  };
+
+  // 터치 영역 확대를 위한 추가 이벤트
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
   };
 
   return (
@@ -249,13 +261,16 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
 
       {/* 장애물 */}
       {obstacles.map(obs => (
-        <div
+        <motion.div
           key={obs.id}
           className="absolute w-6 h-16 bg-gray-600 rounded flex items-center justify-center"
           style={{ left: obs.x, top: 180 }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.2 }}
         >
           🚧
-        </div>
+        </motion.div>
       ))}
 
       {/* 지면 */}
@@ -271,8 +286,10 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
         <button
           onClick={handleClick}
           onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           className="bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg touch-manipulation select-none"
-          style={{ minHeight: '50px', minWidth: '100px' }}
+          style={{ minHeight: '60px', minWidth: '120px' }}
+          disabled={!gameRunning}
         >
           점프! 🦘
         </button>
@@ -297,8 +314,8 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 별 생성
-      if (Math.random() < 0.02) {
+      // 별 생성 (더 흥미로운 패턴)
+      if (Math.random() < 0.025) {
         setStars(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -308,15 +325,15 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
       // 별 이동 및 제거
       setStars(prev => {
-        const newStars = prev.map(star => ({ ...star, y: star.y + 3 }));
+        const newStars = prev.map(star => ({ ...star, y: star.y + 3.5 }));
         const filteredStars = newStars.filter(star => star.y < 300);
         
-        // 잡힌 별 체크
+        // 잡힌 별 체크 (더 정확한 거리)
         const caughtStars = prev.filter(star => {
           const distance = Math.sqrt(
             Math.pow(star.x - playerX, 2) + Math.pow(star.y - 250, 2)
           );
-          return distance < 30;
+          return distance < 35;
         });
         
         if (caughtStars.length > 0) {
@@ -333,24 +350,28 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         
         return filteredStars;
       });
-    }, 50);
+    }, 40); // 더 빠른 업데이트
 
     return () => clearInterval(gameLoop);
   }, [playerX, onComplete, onProgress, gameRunning]);
 
   // 마우스/터치 이벤트
   const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPlayerX(e.clientX - rect.left);
+    if (gameRunning) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setPlayerX(e.clientX - rect.left);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    const touch = e.touches[0];
-    if (touch) {
-      setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+    if (gameRunning) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const touch = e.touches[0];
+      if (touch) {
+        setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+      }
     }
   };
 
@@ -370,13 +391,16 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
       {/* 별들 */}
       {stars.map(star => (
-        <div
+        <motion.div
           key={star.id}
           className="absolute w-6 h-6 text-yellow-300 text-2xl"
           style={{ left: star.x, top: star.y }}
+          initial={{ scale: 0, rotate: 0 }}
+          animate={{ scale: 1, rotate: 360 }}
+          transition={{ duration: 0.3 }}
         >
           ⭐
-        </div>
+        </motion.div>
       ))}
 
       {/* 점수 표시 */}
@@ -406,16 +430,16 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
     const gameLoop = setInterval(() => {
       setSurvivedTime(prev => {
         const newTime = prev + 1;
-        onProgress((newTime / 300) * 100); // 5분 = 300초
-        if (newTime >= 300) {
+        onProgress((newTime / 200) * 100); // 3분 20초 = 200초로 단축
+        if (newTime >= 200) {
           setGameRunning(false);
           onComplete(true);
         }
         return newTime;
       });
 
-      // 적 생성
-      if (Math.random() < 0.03) {
+      // 적 생성 (더 흥미로운 패턴)
+      if (Math.random() < 0.035) {
         setEnemies(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -423,17 +447,17 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         }]);
       }
 
-      // 충돌 검사
+      // 충돌 검사 (더 정확한 거리)
       enemies.forEach(enemy => {
         const distance = Math.sqrt(
           Math.pow(enemy.x - playerX, 2) + Math.pow(enemy.y - playerY, 2)
         );
-        if (distance < 25) {
+        if (distance < 30) {
           setGameRunning(false);
           onComplete(false);
         }
       });
-    }, 100);
+    }, 80); // 더 빠른 업데이트
 
     return () => clearInterval(gameLoop);
   }, [playerX, playerY, enemies, onComplete, onProgress, gameRunning]);
@@ -472,13 +496,16 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
       {/* 적들 */}
       {enemies.map(enemy => (
-        <div
+        <motion.div
           key={enemy.id}
           className="absolute w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white"
           style={{ left: enemy.x, top: enemy.y }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.2 }}
         >
           💀
-        </div>
+        </motion.div>
       ))}
 
       {/* 점수 표시 */}
@@ -506,8 +533,8 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 보석 생성
-      if (Math.random() < 0.02) {
+      // 보석 생성 (더 흥미로운 패턴)
+      if (Math.random() < 0.025) {
         setGems(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -515,13 +542,13 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
         }]);
       }
 
-      // 수집 체크
+      // 수집 체크 (더 정확한 거리)
       setGems(prev => {
         const collectedGems = prev.filter(gem => {
           const distance = Math.sqrt(
             Math.pow(gem.x - playerX, 2) + Math.pow(gem.y - playerY, 2)
           );
-          return distance < 30;
+          return distance < 35;
         });
         
         if (collectedGems.length > 0) {
@@ -540,10 +567,10 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
           const distance = Math.sqrt(
             Math.pow(gem.x - playerX, 2) + Math.pow(gem.y - playerY, 2)
           );
-          return distance >= 30;
+          return distance >= 35;
         });
       });
-    }, 50);
+    }, 40); // 더 빠른 업데이트
 
     return () => clearInterval(gameLoop);
   }, [playerX, playerY, onComplete, onProgress, gameRunning]);
@@ -582,13 +609,16 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
 
       {/* 보석들 */}
       {gems.map(gem => (
-        <div
+        <motion.div
           key={gem.id}
           className="absolute w-8 h-8 text-pink-500 text-2xl"
           style={{ left: gem.x, top: gem.y }}
+          initial={{ scale: 0, rotate: 0 }}
+          animate={{ scale: 1, rotate: 180 }}
+          transition={{ duration: 0.4 }}
         >
           💎
-        </div>
+        </motion.div>
       ))}
 
       {/* 점수 표시 */}
@@ -616,8 +646,8 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 타겟 생성
-      if (Math.random() < 0.02) {
+      // 타겟 생성 (더 흥미로운 패턴)
+      if (Math.random() < 0.025) {
         setTargets(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -625,20 +655,20 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         }]);
       }
 
-      // 총알 이동
-      setBullets(prev => prev.map(bullet => ({ ...bullet, y: bullet.y - 5 })).filter(bullet => bullet.y > -10));
+      // 총알 이동 (더 빠른 속도)
+      setBullets(prev => prev.map(bullet => ({ ...bullet, y: bullet.y - 6 })).filter(bullet => bullet.y > -10));
 
-      // 타겟 이동
-      setTargets(prev => prev.map(target => ({ ...target, y: target.y + 2 })).filter(target => target.y < 300));
+      // 타겟 이동 (더 빠른 속도)
+      setTargets(prev => prev.map(target => ({ ...target, y: target.y + 2.5 })).filter(target => target.y < 300));
 
-      // 충돌 검사
+      // 충돌 검사 (더 정확한 거리)
       setBullets(prev => {
         const hitBullets = prev.filter(bullet => {
           const hitTarget = targets.find(target => {
             const distance = Math.sqrt(
               Math.pow(bullet.x - target.x, 2) + Math.pow(bullet.y - target.y, 2)
             );
-            return distance < 20;
+            return distance < 25;
           });
           return hitTarget;
         });
@@ -660,12 +690,12 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
             const distance = Math.sqrt(
               Math.pow(bullet.x - target.x, 2) + Math.pow(bullet.y - target.y, 2)
             );
-            return distance < 20;
+            return distance < 25;
           });
           return !hitTarget;
         });
       });
-    }, 50);
+    }, 40); // 더 빠른 업데이트
 
     return () => clearInterval(gameLoop);
   }, [targets, onComplete, onProgress, gameRunning]);
@@ -676,29 +706,37 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
   // 마우스/터치 이벤트
   const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setPlayerX(e.clientX - rect.left);
+    if (gameRunning) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setPlayerX(e.clientX - rect.left);
+    }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const rect = e.currentTarget.getBoundingClientRect();
-    const touch = e.touches[0];
-    if (touch) {
-      setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+    if (gameRunning) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const touch = e.touches[0];
+      if (touch) {
+        setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+      }
     }
   };
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    shoot();
+    if (gameRunning) {
+      shoot();
+    }
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    shoot();
+    if (gameRunning) {
+      shoot();
+    }
   };
 
   return (
@@ -726,13 +764,16 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
       {/* 타겟들 */}
       {targets.map(target => (
-        <div
+        <motion.div
           key={target.id}
           className="absolute w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white"
           style={{ left: target.x, top: target.y }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.2 }}
         >
           🎯
-        </div>
+        </motion.div>
       ))}
 
       {/* 점수 표시 */}
@@ -746,7 +787,8 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
           onClick={handleClick}
           onTouchStart={handleTouchStart}
           className="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-bold py-3 px-6 rounded-full text-lg shadow-lg touch-manipulation select-none"
-          style={{ minHeight: '50px', minWidth: '100px' }}
+          style={{ minHeight: '60px', minWidth: '120px' }}
+          disabled={!gameRunning}
         >
           발사! 🔫
         </button>

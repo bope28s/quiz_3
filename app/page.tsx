@@ -54,7 +54,7 @@ export default function Home() {
           </div>
           <div className="text-lg md:text-xl text-gray-700 leading-relaxed">
             용감한 영웅이 되어 퀴즈와 미니게임을 통해 엄마와 아빠를 구출해보세요!<br/>
-            각 관문을 지키는 마법사들과 대화하며 힌트를 모아서<br/>
+            각 관문을 지키는 마법사들과 대화하며 문제를 해결해서<br/>
             마침내 가족의 위치를 찾고 다시 만날 수 있을 거예요! 💕
           </div>
         </motion.div>
