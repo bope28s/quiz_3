@@ -7,10 +7,26 @@ export default function BackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [hasAudioFile, setHasAudioFile] = useState(false);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+
+    // 음악 파일 존재 여부 확인
+    const checkAudioFile = () => {
+      audio.addEventListener('error', () => {
+        console.log('배경음악 파일을 찾을 수 없습니다. 음악 파일을 추가해주세요.');
+        setIsPlaying(false);
+        setHasAudioFile(false);
+      });
+      
+      audio.addEventListener('canplay', () => {
+        setHasAudioFile(true);
+      });
+    };
+
+    checkAudioFile();
 
     // 자동 재생 시도
     const playAudio = async () => {
@@ -66,23 +82,25 @@ export default function BackgroundMusic() {
         <source src="/music/background.wav" type="audio/wav" />
       </audio>
 
-      {/* 음악 컨트롤 버튼 */}
-      <div className="fixed top-4 right-4 z-50 flex gap-2">
-        <button
-          onClick={togglePlay}
-          className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200"
-          title={isPlaying ? '음악 일시정지' : '음악 재생'}
-        >
-          {isPlaying ? '⏸️' : '▶️'}
-        </button>
-        <button
-          onClick={toggleMute}
-          className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200"
-          title={isMuted ? '음소거 해제' : '음소거'}
-        >
-          {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-        </button>
-      </div>
+      {/* 음악 컨트롤 버튼 - 음악 파일이 있을 때만 표시 */}
+      {hasAudioFile && (
+        <div className="fixed top-4 right-4 z-50 flex gap-2">
+          <button
+            onClick={togglePlay}
+            className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200"
+            title={isPlaying ? '음악 일시정지' : '음악 재생'}
+          >
+            {isPlaying ? '⏸️' : '▶️'}
+          </button>
+          <button
+            onClick={toggleMute}
+            className="bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200"
+            title={isMuted ? '음소거 해제' : '음소거'}
+          >
+            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+          </button>
+        </div>
+      )}
     </>
   );
 }

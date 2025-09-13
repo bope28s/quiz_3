@@ -355,8 +355,8 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
           
           setCaughtCount(prev => {
             const newCount = prev + caughtStars.length;
-            onProgress((newCount / 10) * 100);
-            if (newCount >= 10) {
+            onProgress((newCount / 15) * 100);
+            if (newCount >= 15) {
               setGameRunning(false);
               onComplete(true);
             }
@@ -615,8 +615,8 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
           
           setCollectedCount(prev => {
             const newCount = prev + collectedGems.length;
-            onProgress((newCount / 12) * 100);
-            if (newCount >= 12) {
+            onProgress((newCount / 18) * 100);
+            if (newCount >= 18) {
               setGameRunning(false);
               onComplete(true);
             }
@@ -763,8 +763,8 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
           
           setHitCount(prev => {
             const newCount = prev + hitBullets.length;
-            onProgress((newCount / 15) * 100);
-            if (newCount >= 15) {
+            onProgress((newCount / 20) * 100);
+            if (newCount >= 20) {
               setGameRunning(false);
               onComplete(true);
             }
