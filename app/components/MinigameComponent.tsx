@@ -13,7 +13,7 @@ interface MinigameComponentProps {
 export default function MinigameComponent({ minigame, onComplete }: MinigameComponentProps) {
   const [gameState, setGameState] = useState<'intro' | 'playing' | 'result'>('intro');
   const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(40);
   const [gameProgress, setGameProgress] = useState(0);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function MinigameComponent({ minigame, onComplete }: MinigameComp
 
   const startGame = () => {
     setGameState('playing');
-    setTimeLeft(30);
+    setTimeLeft(40);
     setGameProgress(0);
   };
 
@@ -148,8 +148,8 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 장애물 생성 (더 흥미로운 패턴)
-      if (Math.random() < 0.025) {
+      // 장애물 생성 (더 흥미로운 패턴) - 스폰율 더 증가
+      if (Math.random() < 0.06) {
         setObstacles(prev => [...prev, { id: Date.now(), x: 800 }]);
       }
 
@@ -317,6 +317,7 @@ function JumpGame({ minigame, onComplete, onProgress }: { minigame: Minigame; on
 function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; onComplete: (success: boolean) => void; onProgress: (progress: number) => void }) {
   const [stars, setStars] = useState<Array<{id: number, x: number, y: number}>>([]);
   const [playerX, setPlayerX] = useState(400);
+  const [playerY, setPlayerY] = useState(200);
   const [caughtCount, setCaughtCount] = useState(0);
   const [gameRunning, setGameRunning] = useState(true);
   const [particles, setParticles] = useState<any[]>([]);
@@ -325,8 +326,8 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 별 생성 (더 흥미로운 패턴)
-      if (Math.random() < 0.035) {
+      // 별 생성 (더 흥미로운 패턴) - 스폰율 더 증가
+      if (Math.random() < 0.07) {
         setStars(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -342,7 +343,7 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         // 잡힌 별 체크 (더 정확한 거리)
         const caughtStars = filteredStars.filter(star => {
           const distance = Math.sqrt(
-            Math.pow(star.x - playerX, 2) + Math.pow(star.y - 250, 2)
+            Math.pow(star.x - playerX, 2) + Math.pow(star.y - playerY, 2)
           );
           return distance < 35;
         });
@@ -367,7 +368,7 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
         // 잡힌 별들을 제거하고 반환
         return filteredStars.filter(star => {
           const distance = Math.sqrt(
-            Math.pow(star.x - playerX, 2) + Math.pow(star.y - 250, 2)
+            Math.pow(star.x - playerX, 2) + Math.pow(star.y - playerY, 2)
           );
           return distance >= 35;
         });
@@ -375,13 +376,14 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
     }, 40); // 더 빠른 업데이트
 
     return () => clearInterval(gameLoop);
-  }, [playerX, onComplete, onProgress, gameRunning]);
+  }, [playerX, playerY, onComplete, onProgress, gameRunning]);
 
   // 마우스/터치 이벤트
   const handleMouseMove = (e: React.MouseEvent) => {
     if (gameRunning) {
       const rect = e.currentTarget.getBoundingClientRect();
       setPlayerX(e.clientX - rect.left);
+      setPlayerY(e.clientY - rect.top);
     }
   };
 
@@ -393,6 +395,7 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
       const touch = e.touches[0];
       if (touch) {
         setPlayerX(Math.max(0, Math.min(700, touch.clientX - rect.left)));
+        setPlayerY(Math.max(0, Math.min(200, touch.clientY - rect.top)));
       }
     }
   };
@@ -411,7 +414,7 @@ function CatchGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
       {/* 플레이어 */}
       <motion.div 
         className="absolute w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold"
-        style={{ left: playerX - 24, top: 250 }}
+        style={{ left: playerX - 24, top: playerY - 24 }}
         animate={{ 
           scale: [1, 1.1, 1],
           rotate: [0, 5, -5, 0]
@@ -471,16 +474,16 @@ function AvoidGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
     const gameLoop = setInterval(() => {
       setSurvivedTime(prev => {
         const newTime = prev + 1;
-        onProgress((newTime / 200) * 100); // 3분 20초 = 200초로 단축
-        if (newTime >= 200) {
+        onProgress((newTime / 250) * 100); // 25초 = 250프레임
+        if (newTime >= 250) {
           setGameRunning(false);
           onComplete(true);
         }
         return newTime;
       });
 
-      // 적 생성 (더 흥미로운 패턴)
-      if (Math.random() < 0.035) {
+      // 적 생성 (더 흥미로운 패턴) - 스폰율 더 증가
+      if (Math.random() < 0.07) {
         setEnemies(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -589,8 +592,8 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 보석 생성 (더 흥미로운 패턴)
-      if (Math.random() < 0.035) {
+      // 보석 생성 (더 흥미로운 패턴) - 스폰율 더 증가
+      if (Math.random() < 0.07) {
         setGems(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -700,7 +703,7 @@ function CollectGame({ minigame, onComplete, onProgress }: { minigame: Minigame;
 
       {/* 점수 표시 */}
       <div className="absolute top-4 left-4 text-white font-bold bg-black bg-opacity-50 px-3 py-1 rounded">
-        수집: {collectedCount}/20
+        수집: {collectedCount}/18
       </div>
 
     </div>
@@ -720,8 +723,8 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
     if (!gameRunning) return;
 
     const gameLoop = setInterval(() => {
-      // 타겟 생성 (더 흥미로운 패턴)
-      if (Math.random() < 0.035) {
+      // 타겟 생성 (더 흥미로운 패턴) - 스폰율 더 증가
+      if (Math.random() < 0.07) {
         setTargets(prev => [...prev, { 
           id: Date.now(), 
           x: Math.random() * 700, 
@@ -881,7 +884,7 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
 
       {/* 점수 표시 */}
       <div className="absolute top-4 left-4 text-white font-bold bg-black bg-opacity-50 px-3 py-1 rounded">
-        명중: {hitCount}/10
+        명중: {hitCount}/20
       </div>
 
       {/* 슈팅 버튼 */}
