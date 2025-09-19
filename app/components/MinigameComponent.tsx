@@ -764,6 +764,19 @@ function ShootGame({ minigame, onComplete, onProgress }: { minigame: Minigame; o
             }
           });
           
+          // 맞은 타겟들을 제거
+          setTargets(prevTargets => {
+            return prevTargets.filter(target => {
+              const isHit = hitBullets.some(bullet => {
+                const distance = Math.sqrt(
+                  Math.pow(bullet.x - target.x, 2) + Math.pow(bullet.y - target.y, 2)
+                );
+                return distance < 25;
+              });
+              return !isHit;
+            });
+          });
+          
           setHitCount(prev => {
             const newCount = prev + hitBullets.length;
             onProgress((newCount / 20) * 100);
